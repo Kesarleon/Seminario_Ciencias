@@ -1,10 +1,10 @@
 ---
 title: "Paradigmas de Programación"
 author: "Maria L Zamora y Ali Limon"
-date: "Agosto 13, 2018"
+date: "Agosto 14, 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 <style>
