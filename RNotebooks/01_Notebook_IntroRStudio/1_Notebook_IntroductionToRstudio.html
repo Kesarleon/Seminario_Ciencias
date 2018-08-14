@@ -195,16 +195,13 @@ p.caption {
 <p><br /> En particular, los R Markdowns (igual que los R Notebooks) tienen la ventaja de poder correr este lenguaje en la plataforma de R studio. En el siguiente ejemplo podemos ver el lenguaje Bash que ejecuta un <em>Script</em> de R para crear dos gráficas muy sencillas <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>. Para ello se utilizan principalmente “ls” que hace una lista de los archivos, y “Rscript” que ejecuta el código en R.</p>
 <p><br /></p>
 <pre class="bash"><code>printf &quot;Prueba de Bash:&quot;
-pwd
-printf &quot;..............&quot;
 ls
 printf &quot;..............&quot;
 ls files/
 printf &quot;..............&quot;
 Rscript files/RscriptDemo.R
 ls  files/</code></pre>
-<pre><code>## Prueba de Bash:/Users/mariazamora/Library/Mobile Documents/com~apple~CloudDocs/UNAM CURSO/CURSO/2018_UNAM_CienciaDeDatosCapitales/RNotebooks/01_Notebook_IntroRStudio
-## ..............1_Notebook_IntroductionToRstudio.Rmd
+<pre><code>## Prueba de Bash:1_Notebook_IntroductionToRstudio.Rmd
 ## 1_Notebook_IntroductionToRstudio.html
 ## 1_Notebook_IntroductionToRstudio.pdf
 ## 1_Notebook_ParadigmasDeProg.Rmd
@@ -235,14 +232,14 @@ for file_i in files/*.png; do
 done
 ls -l files/</code></pre>
 <pre><code>## total 104
-## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 00:41 Rgraph1.png
-## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 00:41 Rgraph2.png
-## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 00:41 Rplot1.png
-## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 00:41 Rplot2.png
+## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 22:48 Rgraph1.png
+## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 22:48 Rgraph2.png
+## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 00:15 Rplot1.png
+## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 00:15 Rplot2.png
 ## -rwxr-xr-x@ 1 mariazamora  staff    157 Aug  5 18:06 RscriptDemo.R
 ## ..............total 56
-## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 00:41 Rplot1.png
-## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 00:41 Rplot2.png
+## -rw-r--r--  1 mariazamora  staff   9658 Aug 13 22:48 Rplot1.png
+## -rw-r--r--  1 mariazamora  staff  10439 Aug 13 22:48 Rplot2.png
 ## -rwxr-xr-x@ 1 mariazamora  staff    157 Aug  5 18:06 RscriptDemo.R</code></pre>
 <p><br /> En el ejemplo anterior, la lista de archivos incluye una descripción del archivo. Esto se debe a que agregamos el atributo/argumento “-l” en el comando “ls”. Por ahora con eso es suficiente pero durante el curso se mostrarán otros comandos para el manejo de datos.</p>
 <hr />

@@ -3,8 +3,8 @@ title: "Plataformas iniciales de trabajo: R Studio, R Markdowns y Consola"
 author: "Maria L Zamora y Ali Limon"
 date: "Agosto 14, 2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 <style>
@@ -140,8 +140,6 @@ En particular, los R Markdowns (igual que los R Notebooks) tienen la ventaja de 
 
 ```{bash}
 printf "Prueba de Bash:"
-pwd
-printf ".............."
 ls
 printf ".............."
 ls files/
