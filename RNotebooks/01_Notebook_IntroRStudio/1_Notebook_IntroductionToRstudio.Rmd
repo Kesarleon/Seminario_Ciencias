@@ -1,7 +1,7 @@
 ---
 title: "Plataformas iniciales de trabajo: R Studio, R Markdowns y Consola"
 author: "Maria L Zamora y Ali Limon"
-date: "Agosto 14, 2018"
+date: "Agosto 16, 2018"
 output:
   pdf_document: default
   html_document: default
@@ -134,12 +134,13 @@ La *Consola*, también conocida como *Terminal, Unix Shell, o Command Line Inter
 **Por qué es importante conocer estos términos?** Hoy en día el uso de estos comandos es cada vez mayor debido a que permiten automatizar procesos. Por ejemplo, dependiendo el tipo de datos que se tengan (normalmente datos a gran escala), algunas veces es necesario descargar, unir, cortar, comprimir o convertir archivos desde la *Consola* con el fin de optimizar tiempos. Además, es importante conocer lo que hay detrás del lenguaje de programación que utilizamos y otras maneras de ejecutar programas o instalar paqueterías (sin el uso de IDEs). 
 
 <br />
-En particular, los R Markdowns (igual que los R Notebooks) tienen la ventaja de poder correr este lenguaje en la plataforma de R studio. En el siguiente ejemplo podemos ver el lenguaje Bash que ejecuta un *Script* de R para crear dos gráficas muy sencillas [^4]. Para ello se utilizan principalmente "ls" que hace una lista de los archivos, y "Rscript" que ejecuta el código en R.
+En particular, los R Markdowns (igual que los R Notebooks) tienen la ventaja de poder correr este lenguaje en la plataforma de R studio. En el siguiente ejemplo podemos ver el lenguaje Bash que ejecuta un **Script** de R para crear dos gráficas muy sencillas [^4]. Para ello se utilizan principalmente "ls" que hace una lista de los archivos, y "Rscript" que ejecuta el código en R.
 
 <br />
 
 ```{bash}
 printf "Prueba de Bash:"
+printf ".............."
 ls
 printf ".............."
 ls files/
@@ -209,7 +210,7 @@ plot(pressure)
 
 [^1]: [Notas auxiliares](https://nbviewer.jupyter.org/github/UNAMCiencias-Seminario-CienciaDeDatos/Seminario_Ciencias/blob/master/RNotebooks/01_Notebook_IntroRStudio/1_Notebook_ParadigmasDeProg.html) de lenguajes de programación
 
-[^2]: Guía baásica de [Github (link)](https://guides.github.com/introduction/git-handbook/)
+[^2]: Guía básica de [Github (link)](https://guides.github.com/introduction/git-handbook/)
 
 [^3]: Para más detalles [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
 
