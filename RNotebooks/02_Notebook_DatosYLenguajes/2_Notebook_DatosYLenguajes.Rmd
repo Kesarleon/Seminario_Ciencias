@@ -320,7 +320,7 @@ knitr::include_graphics("images/msql.jpg")
     
   * Datos en la web: Múltiples formatos y patrones.
 
-    + Cualquiera de los tipos de datos mencionados hasta el momento pueden encontrarse no solo como archivos o Bases de Datos, actualmente existen muchas herramientas para extraer los **_datos desde la Web_**. Muchas veces cuentan con patrones específicos construidos con formatos como **_HTML, XML y JSON[^4]_**, entre otros. Este proceso de extracción es mejor conocido como **_Web Crawling o Web Scraping_**, durante el curso vamos a aprender algunas de las técnicas más relevantes para extraer y procesar dichas estructuras.
+    + Cualquiera de los tipos de datos mencionados hasta el momento pueden encontrarse no solo como archivos o Bases de Datos, actualmente existen muchas herramientas para extraer los **_datos desde la Web_**. Muchas veces cuentan con patrones específicos construidos con formatos como **_HTML, XML y JSON[^4]_**, entre otros. Este proceso de extracción es mejor conocido como **_Web Crawling o Web Scrapping_**, durante el curso vamos a aprender algunas de las técnicas más relevantes para extraer y procesar dichas estructuras.
     
 <br />
 
