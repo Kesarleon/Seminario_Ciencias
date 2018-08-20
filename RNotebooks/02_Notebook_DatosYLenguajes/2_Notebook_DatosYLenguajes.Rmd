@@ -1,11 +1,10 @@
 ---
 title: "Tipos de Datos, Estructuras y Lenguajes de Programación en Ciencia de Datos"
 author: "Maria L Zamora y Ali J Limón"
-date: "August 15, 2018"
+date: "August 20, 2018"
 output:
   html_document: default
   pdf_document: default
-  word_document: default
 ---
 
  
