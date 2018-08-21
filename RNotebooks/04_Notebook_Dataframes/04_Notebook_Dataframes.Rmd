@@ -1,0 +1,214 @@
+---
+title: "Paradigmas de Programación"
+author: "Maria L Zamora y Ali Limon"
+date: "Agosto 23, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+# IV. Dataframes y Manipulación de Datos.
+
+## Introducción
+
+En un mundo ideal, uno esperaría recibir una base de datos y enfocarse en la aplicación y desarrollo de modelos para generar información con dicha base. Sin embargo, a menudo uno necesita dedicar una parte sustancial de tiempo en el masajeo, limpieza y transformación de datos para facilitar la aplicación de modelos estadísticos y computacionales. Es por esto que una de las fases más importantes en la minería de datos es el procesamiento y transformación de datos. En esta clase aprenderemos algunas de las herramientas más importantes para la transformación de datos. 
+
+## La Base de Datos
+Para esta clase usaremos una base de datos (dataset) que incluye una muestra (sample) de todas las compañías con información disponible en Yahoo Finance. El dataset incorpora distintas características (features) propias de las compañías como nombre (name), país de domicilio (country), industria (industry), entre otros. Por su naturalez, los datos sólo incluyen compañías públicas, que cotizan en el mercado y, por ende, que tienen asociadas instrumentos de inversión tales como: acciones, bonos, commodities, entre otros. 
+
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/yahoo.jpg")
+```
+
+Este dataset fue construido usando un programa que permite extraer datos de la web por medio de consultas a la página de Yahoo Finance, y almacenarlos en filas de tipo "json". Estas filas “json” son posteriormente procesadas para almacenar su contenido de forma estructurada en un archivo ".csv". Este proceso es llamado web scraping y más adelante en el curso revisaremos cómo diseñar estos programas que son muy útiles para obtener datos de la web.
+
+
+## Exploración Básica de Datos
+
+Primero que nada empezaremos por una exploración sencilla de nuestro dataset. La función read.csv nos permite leer y almacenar el archivo en un objeto data frame que llamaremos global_companies.
+
+Un data frame es usado para almacenar tablas de datos (data tables), que son listas de vectores de misma longitud. Los principales componentes del data frame son: titulo (header), renglon de dato (data row) y celdas (cell).  
+
+
+```{r}
+global_companies<- read.csv('dataset/global_companies.csv')
+head(global_companies, 1)
+colnames(global_companies)
+```
+
+Uno de los pasos iniciales en la fase de exploración es identificar la dimensión de la base de datos, para que con base en eso se puedan definir las herramientas apropiadas para analizarlos. 
+
+
+```{r}
+print(paste0('Nùmero de Renglones ', nrow(global_companies)))
+print(paste0('Nùmero de Columnas ', ncol(global_companies)))
+```
+
+Tambien es indispensable identificar el tipo de variables que incluye la base de datos, y saber si se estará trabajando con variables continuas o discretas (categoricas). 
+
+```{r}
+sapply(global_companies, class)
+```
+
+<span style="color:gray"> Nota : Conceptualmente, factores son variables (factor variables) en R que pueden tomar un limitado número de diferentes valores (categorías), estas variables son normalmente referidas como variables categóricas (categorical variables). Este tipo de variables son frecuentemente usadas en modelaje estadístico dado que estas son tratadas de manera diferente a variables continuas. Almacenar datos como factores garantiza que muchas funciones de análisis estadístico y de aprendizaje automático trabajen correctamente. </span>
+
+## Transformaciones de Datos
+
+En cuestión de transformaciones hay cinco funciones claves que permiten resolver la mayoría de los retos relacionados a manipulación de datos.   
+
+*  Filtrar observaciones por sus valores 
+
+*  Ordenar renglones
+
+*  Escoger variables por sus nombres
+
+*  Crear nuevas variables en función de variables existentes
+
+*  Agregar información con base a un criterio
+
+Para cada una de estas tareas *dplyr* tiene una función definida, y es el paquete en el que nos basaremos en las siguientes secciones; sin embargo *R* tambien tiene precargada una función llamada *subset* que lleva a cabo las mismas tareas.  
+
+
+```{r}
+library(dplyr)
+```
+
+Para ambas funciones el primer argumento es un dataframe y los subsecuentes describen funciones especificas que se aplicar a los datos.
+
+### 1) Filtrar Observaciones por sus Valores
+La función de filtrado permite obtener subconjuntos (subset) de la base de datos original con base en criterios aplicados a los valores de los renglones. Al aplicar la función de filtrado, el valor de salida (output) es un nuevo dataframe. 
+
+```{r}
+# Las siguientes lineas de codigo son equivalentes
+# Obtener Compañias con Domicilio en México
+mx_companies<- filter(global_companies, Country=="Mexico")
+mx_companies<- global_companies %>% filter(Country=="Mexico")
+mx_companies<- subset( global_companies, Country=="Mexico")
+head(mx_companies, 1)
+```
+
+### Comparaciones 
+Para realizar filtrados de manera efectiva, uno tiene que saber la manera de seleccionar las observaciones deseadas usando los operadores de comparación. En R estos son: >, >=, <, <=, !=, ==.
+
+### Operadores Logicos
+
+Múltiples argumentos para filtrar pueden ser combinados con & (and): lo cual implica que todas las expresiones deben ser TRUE para que puedan ser incluidas en el data frame de salida. Otro tipo de combinaciones pueden ser logradas usando los operadores: | (or), ! (not) y %in% (in). La siguiente gráfica muestra todo tipo de combinaciones. 
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/boolean_op.jpg")
+```
+
+```{r}
+### Obtener Compañias de México y DF
+df_companies<- filter(global_companies, Country=="Mexico" & State=='DF')
+### Obtener Compañias de México y que no son del DF
+nonDf_companies<- filter(global_companies, Country=="Mexico" & State!='DF')
+head(unique(df_companies$Name))
+head(unique(nonDf_companies$Name))
+
+```
+
+### Valores Faltantes
+
+El problema de datos o valores faltantes se encuentran en casi todas las tareas relacionadas con análisis estadístico y base de datos. Existen muchos métodos para identificar y manejar estos datos. En esta sección, hablaremos brevemente sobre cómo identificarlos; sin embargo, es importante mencionar que muchas herramientas y modelos han sido desarrolladas para estimar valores ausentes con base en valores válidos de otras variables (data imputation).   
+
+Para filtrar valores faltantes o nulos existe la función is.na(), que determina si un valor es de tipo NA ("not avaliable"). Adicionalmente, los valores faltantes también pueden estar representados con celdas vacías (blank/empty).
+
+
+```{r}
+
+print(nrow(global_companies))
+### Filtrar valores ausentes en la base de datos
+naZip_companies<- filter(global_companies, is.na(zip))
+
+### Descartar datos donde el valor Industria este ausente
+global_companies<- filter(global_companies, !is.na(Industry))
+global_companies<- filter(global_companies, Industry!='')
+print(nrow(global_companies))
+```
+## 2) Ordenar Renglones
+Existen diferentes funciones que permiten ordenar renglones con base en criterios aplicados a los valores. Los criterios normalmente utilizados permiten ordenar renglones de manera ascendente/descendente basado en el valor numérico u orden alfabético, dependiendo el tipo de datos. 
+
+```{r}
+### Descendente (de mayor a menor) en fullTimeEmployee. Compañías con mayor número de empleados se encuentran en lo más alto de la table
+
+biggest_companies<- arrange(global_companies, desc(fullTimeEmployee))
+
+print(head(unique(paste0(biggest_companies$Name, "-", biggest_companies$fullTimeEmployee))))
+
+
+### Ascendente (de menor a mayor) en Industry y descente en fullTimeEmployee
+
+biggest_companies_industry<- arrange(global_companies, Industry, desc(fullTimeEmployee) )
+
+print(head(unique(paste0(biggest_companies_industry$Name, "-", biggest_companies_industry$Industry, "-",biggest_companies_industry$fullTimeEmployee ))))
+
+```
+## 3) Seleccionar Columnas
+Es muy común que los datasets incluyan columnas que no son relevantes para el análisis o modelos que queremos implementar. En este sentido, nos gustaría conocer funciones que nos permitan reducir el número de variables (columnas) de nuestro dataset. La función select es útil para esta tarea.
+
+
+```{r}
+#### Seleccionar ciertas columnas
+global_companies_sub<- select(global_companies, Name, Ticker, Industry, Sector)
+head(global_companies_sub, 4)
+
+### Seleccionar Name y columnas entre Ticker y Country
+global_companies_sub<- select(global_companies, Name, Ticker:Country)
+head(global_companies_sub, 4)
+
+### Seleccionar todas las columnas a excepcion de LongBusinessSummary y Website
+global_companies_sub<- select(global_companies, - c(LongBusinessSummary, Website))
+head(global_companies_sub, 4)
+```
+
+Adicionalmente, hay un gran numero de funciones que uno puede usar con select():
+
+* starts_with("abc") Encuentra columnas que empiezan con "abc"
+* end_with("abc") Encuentra columnas que terminan con "abc"
+* contains("abc") Encuentra columnas que contienen con "abc"
+* matches("abc") Selecciona columnas que inlcuyen una expresion regular (regular expression). 
+
+## 4) Agregar Columnas
+Además de seleccionar conjuntos de columnas existentes, la mayoría de las veces es necesario agregar nuevas columnas, ya sea en función de columnas existentes o sin alguna relación explícita a estas.
+
+```{r}
+### Agregar una columna nueva llamada Company Type, la cual llenaremos con el valor PUBLIC, y se refiere a que todas las compañias en el dataset son publicas. 
+global_companies$Company_Type<- 'PUBLIC'
+
+### Agregar una columna nueva llamada MarketCap (Capitalizacion de Mercado), que es el producto de currentPrice y SharesOutstanding
+global_companies$marketCap<- global_companies$currentPrice * global_companies$sharesOutstanding
+global_companies<- mutate(global_companies, marketCap = currentPrice * sharesOutstanding)
+```
+## 5) Sumarizar datos
+La última de las transformaciones que revisaremos está relacionada a sumarizar y agrupar datos. Esta función es una de las más importantes para exploración de datos.
+
+
+```{r}
+### Obtener numero de Compańias por Industria
+count(global_companies, Industry)
+
+### Filtrar Compañias que cotizan en la Bolsa Mexicana
+bmv_companies<- filter(global_companies, Exchange=='MEX', Industry!='' )
+### Agrupar compañias que cotizan en la Bolsa Mexicana por sector
+industry_bmv <- group_by(bmv_companies, Sector)
+### Sumarizar compañias que cotizan en la Bolsa Mexicana por sector y Market Cap
+industry_bmv <- summarize(industry_bmv, count = n(), marketCap_sum= sum(marketCap)/1000000000, marketCap_average= mean(marketCap, na.rm = TRUE)/1000000000)
+arrange(industry_bmv, desc(marketCap_sum))
+```
