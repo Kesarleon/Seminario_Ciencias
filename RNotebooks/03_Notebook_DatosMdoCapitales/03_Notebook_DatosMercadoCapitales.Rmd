@@ -3,8 +3,8 @@ title: "Datos en el Mercado de Capitales"
 author: "Maria L Zamora y Ali J Limón"
 date: "Agosto 20, 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
 ---
 
@@ -198,20 +198,20 @@ otherXday
 
  
  <br />
- Dicho lo anterior, el proceso de muestras con reemplazo es mejor conocido como **Bootstrapping (Resampling)** y justamente se utiliza cuando tenemos una muestra representativa  e independiente (non-heavy-tailed). En dicha muestra no deben existir autocorrelaciones (para series de tiempo existe **block bootstrap**), y se espera que la varianza corresponda a la misma distribución de probabilidad (heteroscedasticity).
+ Dicho lo anterior, el proceso de muestras con reemplazo es mejor conocido como **Bootstrapping (Resampling)** y justamente se utiliza cuando tenemos una muestra representativa  e independiente (non-heavy-tailed). En dicha muestra no deben existir autocorrelaciones (para series de tiempo existe **block bootstrap**), y se espera que la varianza corresponda a la misma distribución de probabilidad.
  
 <br />
 
-  * Bootstrapping the [Zero coupon yield curve - Construction]( http://www.iotafinance.com/en/Article-The-construction-of-a-zero-coupon-yield-curve-by-the-method-of-bootstrapping.html)
+  * Bootstrapping in finance: [Zero coupon yield curve - Construction]( http://www.iotafinance.com/en/Article-The-construction-of-a-zero-coupon-yield-curve-by-the-method-of-bootstrapping.html)
     + Motivation:  Relation between Yield-to-maturity (bond’s expected return) on a zero coupon bond and another bond's maturity - Benchmark - Spread
     + Common data used: Libor, Future/Forwards and Swap rates. 
     + Additional steps: Interpolate missing periods.
     
 <br />
     
-  * Bootstrapping for multiple imputation of missing data 
+  * Bootstrapping in statistics for missing data:
     + Field: Social sciences / Surveys / Incomplete subjects and entities
-    + Expectation-maximization approach with rectangularized versions vs listwise deletion. Multivariate norma distribution predicted.
+    + Multivariate normal distribution predicted.
     + R package: [Amelia II](https://gking.harvard.edu/files/gking/files/amelia_jss.pdf)
     + Works fast with a large number of variables
     + Other authors: Rubin and Schenker (1986), Rubin (1994), and Shao and Sitter (1996)
