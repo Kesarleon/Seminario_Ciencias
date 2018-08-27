@@ -1,0 +1,318 @@
+---
+title: "Datos Relacionales"
+author: "Maria L Zamora y Ali Limon"
+date: "Agosto 27, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+##1. Introducción
+
+En la clase anterior revisamos las principales funciones que permiten hacer transformaciones a data frames y así preparar información para el análisis de datos. Sin embargo, es muy raro que esta preparación de datos involucre una sola tabla, y por lo tanto el desarrollo y conocimiento de herramientas que permitan combinar muchas tablas es indispensable. Colectivamente, muchas tablas de datos son llamadas relacionales por que la importancia radica en su sus relaciones, en contraste con datasets individuales.
+
+Relaciones son siempre definidas entre un par de tablas. Considerando esta idea, uno puede generalizar y pensar que la relación de tres o más tablas es siempre un propiedad de las relaciones entre cada par de ellas. 
+
+Para trabajar con datos relacionales existen ciertos verbos clave que son aplicados sobre pares de tablas. Estos se pueden agrupar en tres familias: 
+
+*  Mutating Joins, los cuales añaden variables nuevas a un data frame al empatar observaciones con otra. 
+
+* Filtering Joins, los cuales filtran observaciones de un data frame basado en si estos empatan con observaciones de otra tabla.  
+
+* Set operations, los cuales tratan observaciones como si fueran elementos de un conjunto. 
+
+Como se ha platicado anteriormente, los lugares más frecuentes para encontrar datos relacionales son en sistemas de administración de base de datos (RDMS), que en la mayoría de los casos utilizan un lenguaje SQL. 
+
+
+##2. Base de Datos
+Para introducir este tema usaremos la misma información de la clase anterior, global companies. En esta ocasión la información está segregada en cuatro bases que incorporan información específica:
+
+* company universe: Con información relacionada al domicilio de todas las compañías disponibles en Yahoo. 
+
+* company classification: Con información relacionada a la clasificación de Industria y Sector de cada compañía 
+
+* company description: Con información sobre la descripción de la compañía
+
+* security universe: Con información sobre todos los instrumentos emitidos y disponibles en Yahoo.
+
+* company security: Con información sobre todos instrumentos emitidos por cada compañía.
+
+Las compañías están identificadas por una variable llamada comp_id y los instrumentos por sec_id. El diagrama siguiente muestra las relaciones entre nuestras tablas:
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/relational.jpg")
+```
+
+Más adelante en el curso, estaremos analizando a profundidad la base prices, que contiene información sobre los precios de mercado de instrumentos disponibles en security universe.  Por ahora la incluimos en el diagrama para ilustrar las relaciones entre nuestras tablas.
+
+
+La clave para entender diagramas como este es recordar que cada relación siempre concierne a un par de tablas. En este sentido, uno no necesita analizar todo el diagrama como tal; pero sí enfocarse en relaciones entre el par de tablas que uno está interesado.
+
+
+##3. Keys
+
+Las variables usadas para conectar cada par de tablas son llamadas llaves/clave (keys). Una llave es una variable que identifica de manera única una observación. Por ejemplo, en la base company description cada compañía está únicamente identificada por su id: comp_id. 
+
+En otros casos, múltiples variables pueden ser necesitadas. Por ejemplo en la base prices la observación está identificada por ticker y date
+
+Podemos decir que hay dos tipos de llaves:
+
+* Una llave primaria, que identifica una observación es su propia tabla. Por ejemplo comp_id es una llave primaria porque identifica de manera única las compañías en nuestra tabla company description.
+
+* Una llave foránea es la variable de una tabla que se refiere a la llave primaria de otra tabla. Por ejemplo, comp_id es una llave foránea en la tabla company classification con relación a comp_id de la tabla company description.
+
+Una vez que se identifican estas variables o llaves, es buena práctica verificar que de hecho identifican de manera única cada observación. Podemos verificar esto haciendo un count
+
+```{r}
+suppressMessages(library(dplyr))
+comp_profile<-read.csv('dataset/dataset_comp_profile.csv')
+
+#### Numero de observaciones con duplicados
+nrow(comp_profile %>% count(comp_id) %>% filter(n > 1))
+
+```
+Al trabajar con estos datos, estamos asumiendo que cada compañía está únicamente identificada por un comp_id, lo cual facilita significativamente nuestro trabajo para unir tablas. Sin embargo, en algunos casos las tablas tienen ausente la llave primaria y es necesario crear una artificialmente; a este tipo de llaves se les llama llaves *subrogadas*. Las llaves subrogadas permiten encontrar observaciones con mayor facilidad si uno ya ha transformado la información y quiere comparar con los datos originales. 
+
+
+```{r}
+
+comp_profile_sub<- comp_profile
+
+### Suponemos que la llave comp_id no existe
+comp_profile_sub$comp_id<- NULL
+
+## Creamos una llave subrogada considerando el número de renglón
+comp_profile_sub<-comp_profile_sub %>% mutate(surrogated_key=paste0('sub_key_',row_number(Name)))
+head(comp_profile_sub)
+```
+
+Una llave primaria y su correspondiente llave foránea en otra tabla, forman una relación. Relaciones son típicamente uno a muchos y pocas veces uno a uno. En nuestras tablas, cada instrumento (sec_id) tiene relacionado una compañía, es decir, un instrumento pudo haber sido emitido solamente por una compañía (uno a uno) pero cada compañía puede tener uno o varios instrumentos cotizando en el mercado (uno a muchos). 
+
+##4. Mutating Joins
+La primera herramienta que revisaremos para combinar un par de tablas es el mutating join. Un mutating join te permite combinar variables de dos tablas. Primero empatando las observaciones por sus llaves, y después copiando las variables de una tabla a otra.  
+
+Al igual que mutate(), las funciones join añaden variables a la derecha. Por ejemplo, si quisiéramos saber qué compañías emitieron cada instrumento disponible en la base security universe tendríamos que realizar un left join de esta base con la base company security, cuya información incluye la relación de compañías e instrumentos.  
+
+
+```{r}
+sec_universe<-read.csv('dataset/dataset_sec.csv')
+company_security<-read.csv('dataset/dataset_sec_comp.csv')
+
+sec_universe_comp<- sec_universe %>%  left_join(company_security, by = "sec_id")
+head(sec_universe_comp)
+
+```
+
+El mismo join puede lograrse usando la funcion merge()
+```{r}
+sec_universe_comp<- merge(sec_universe, company_security, by.x = 'sec_id', by.y='sec_id')
+sec_universe_comp<- sec_universe_comp %>% arrange(Ticker)
+head(sec_universe_comp)
+
+```
+
+En las siguientes secciones se explicará más a fondo cómo trabajan los mutating joins.  Empezaremos por aprender la representación visual de los joins. Subsecuentemente, usaremos esto como base para explicar las cuatro funciones principales del mutating join: inner join, left join, right join y full join.
+
+###4.1 Entendiendo Joins
+Para entender cómo funcionan los joins usaremos la siguiente  representación visual:
+ 
+
+```{r, out.width = "150px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_1.jpg")
+```
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     3, "x3"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     4, "y3"
+)
+```
+Las columnas coloreada representa la variable "llave": que son usadas para empatar los renglones entre tablas. Las columnas grises representan la columna valor "valor", que es la variable que uno carga al aplicar estas funciones a las tablas. Los siguientes ejemplos están basados en una sola variable llave, pero la idea puede ser generalizada de una manera muy sencilla a múltiples variables y valores.
+
+Un join es la manera de conectar cada renglón en x a ninguna, una o más renglones en y. El siguiente diagrama muestra los potenciales empates por medio de interseccion entre un par de líneas. 
+
+
+```{r, out.width = "200px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_2.jpg")
+```
+
+Como podrás notar, en este diagrama hemos cambiado el orden de la llave y el valor. Esto con la intención de enfatizar que los joins están basado en una llave, y que el valor es solamente cargado al aplicar la función.
+
+Al realizar un join, los empates serán indicados con puntos. El número de puntos indica el número de empates y a su vez el número de renglones en el resultado. 
+
+```{r, out.width = "300px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_3.jpg")
+```
+
+###4.2 Inner Join
+
+El tipo más sencillo de join es llamado inner join. Un inner join empata un par de observaciones todo momento que las llaves sean iguales.
+
+```{r, out.width = "300px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_3.jpg")
+```
+
+El resultado de realizar un inner join es un nuevo data frame que contiene la llave, los valores x y los valores y. 
+
+```{r}
+x %>% 
+  inner_join(y, by = "key")
+```
+###4.3 Outer Joins 
+El inner join conserva observaciones que aparecen en ambas tablas. Un outer join conserva observaciones que aparecen en al menos una de las tablas. Existen tres tipos de outer joins:
+
+* Left Join: conserva todas las observaciones de x
+* Right Join: conserva todas las observaciones de y
+* Full Join: conserva todas las observaciones de ambas tablas.  
+
+Estos joins trabajan al añadir un observación "virtual" a cada tabla. Esta observación tiene una llave que siempre empata y un valor llenado con NA.
+
+Gráficamente los joins se ven de la siguiente manera:
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_4.jpg")
+```
+
+El join mas común es el left join: uno lo usa todo el tiempo que se necesita encontrar datos adicionales de otra tabla. Left join es muy especial porque preserva las observaciones originales incluso cuando no existe un empate. El left join debería ser tu join base: usalo a menos que tengas una fuerte razón para realiza alguno de los otros.
+
+Otra manera de visualizar los diferentes tipos de joins es con un diagrama de Venn:
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_5.jpg")
+```
+
+Las funciones más comunes para aplicar joins son las siguientes.
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_aux.jpg")
+```
+
+###4.4 Duplicate Keys
+Al momento en todos los diagramas hemos asumido que las llaves son únicas. Pero este no siempre es el caso. Esta sección explica lo que pasa cuando las llaves no son únicas. Existen dos posibilidades:
+
+* Una tabla tiene llaves duplicadas. Esto es muy útil cuando tu quieres incorporar información adicional considerando que típicamente hay relaciones uno a muchos. 
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_6.jpg")
+```
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     1, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2"
+)
+left_join(x, y, by = "key")
+```
+
+* Ambas tablas tienen llaves duplicadas. Esto es usualmente un error debido a que ninguna de las tablas tienen una llave que identifica de manera única una observación. Cuando tu juntas llaves duplicadas, tu obtienes todas las posibles combinaciones:
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_7.jpg")
+```
+
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     3, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     2, "y3",
+     3, "y4"
+)
+left_join(x, y, by = "key")
+```
+
+###5. Filtering joins
+
+
+Filtering joins empatan observaciones de la misma manera que mutating joins, pero estos afectan las observaciones, no las variables. Existen dos tipos:
+
+* semi_join(x, y) conserva las observaciones en x que tienen un empate en y. 
+
+* anti_join(x, y) tira las observaciones en x que tiene un empate en y
+
+
+Gráficamente, un semi-join luce de la siguiente manera:
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_8.jpg")
+```
+
+
+Solamente la existencia de un empate es importante; sin importar que observación es empatada. Semi-joins son útiles para reconstruir tablas filtradas a los renglones originales. 
+
+El inverso de un semi-join es un anti-join. Un anti-join conserva los renglones que no tienen un empate. 
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/joins_9.jpg")
+```
+
+Anti-joins son útiles para diagnosticar desempates en joins. Por ejemplo analizar cuantos instrumentos en security universe no tienen una compañía relacionada. 
+
+###6. Operaciones Set
+Generalmente las operaciones Set no son tan usadas; sin embargo en algunas de las ocasiones son utiles cuando uno quiere descomponer un filtrado de gran complejidad en piezas más sencillas. Todas estas operaciones trabajan con un renglón completo, comparando los valores de cada variable. Estas operaciones esperan que las variables de entrada x y tengan las mismas variables, y tratar las observaciones como conjuntos: 
+
+* intersect(x, y): regresa solo observaciones que están en x y y
+* union(x, y): regresa observaciones únicas en x y y
+* setdiff(x, y): regresa observaciones en x, pero que no están en y.
+
+Aquí tenemos un ejemplo:
+
+```{r}
+df1 <- tribble(
+  ~x, ~y,
+   1,  1,
+   2,  1
+)
+df2 <- tribble(
+  ~x, ~y,
+   1,  1,
+   1,  2
+)
+
+intersect(df1, df2)
+union(df1, df2)
+setdiff(df1, df2)
+setdiff(df2, df1)
+
+```
+
