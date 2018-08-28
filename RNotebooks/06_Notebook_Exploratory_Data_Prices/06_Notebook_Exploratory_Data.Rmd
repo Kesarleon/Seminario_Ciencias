@@ -1,0 +1,241 @@
+---
+title: "Exploración de Datos"
+author: "Maria L Zamora y Ali Limon"
+date: "Agosto 28, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+##1. Introducción
+
+En las clases anteriores hemos revisado las principales funciones que nos permiten transformar y preparar datos con una o más tablas. En esta clase hablaremos del análisis exploratorio de datos  (exploratory data analysis or EDA), que se refiere a la exploración de datos de manera sistemática. Este proceso es un ciclo interactivo en el que tienes que:
+
+* Generar preguntas sobre tus datos.
+
+* Buscar respuestas visualizando, transformando, y modelando tus datos.
+
+* Usar lo que aprendiste para refinar tus preguntas y/o generar nuevas preguntas. 
+
+Antes que nada, es importante mencionar que la exploración de datos, no es un proceso formal que sigue un estricto conjunto de reglas. Más que nada, es un estado mental. Durante las fases iniciales uno debería sentirse libre de investigar cada idea que se te ocurre. Algunas de estas ideas serán exitosas y otras un callejón sin salida. Conforme vayas continuando, tu arribaras a algunas áreas productivas de donde eventualmente podrás obtener un valor agregado.
+
+##2. Preguntas
+
+
+El objetivo durante el proceso de exploración es desarrollar un entendimiento de nuestra información. La manera más fácil de hacer esto es utilizar las preguntas como herramientas de tu investigación.  Cuando tu haces una pregunta, la pregunta enfoca tu atención en una parte específica de tu dataset y te ayuda a decidir qué graficas, modelos o transformaciones debes hacer. 
+
+El análisis exploratorio es fundamentalmente un proceso creativo. Y como muchos de los procesos creativos, la clave de responder preguntas de calidad es generar una gran cantidad de preguntas. Es muy dificil hacer preguntas reveladoras en el comienzo de tu análisis debido a que tu no sabes qué información está contenida en tu dataset. Por otro lado, cada pregunta nueva que haces te  expondrá a un nuevo aspecto de tu información e incrementa tu probabilidad de  de hacer un descubrimiento.
+
+No hay ninguna regla para saber qué preguntas debes hacer para guiar tu investigación. Sin embargo, dos tipo de preguntas son muy útiles para hacer descubrimientos dentro de tus datos:
+
+
+*  ¿Qué tipo de variaciones ocurren dentro de mis variables?
+
+*  ¿Qué tipo de covariación ocurren entre las variables?
+
+
+Finalmente, existen algunos conceptos que debes de tener muy claros en la etapa de exploración de datos:
+
+* Una variable es una cantidad, calidad o propiedad que tú puedes medir. 
+
+* Un valor es el estado de una variable cuando tu la mides. El valor de la variable puede cambiar desde el punto de vista del medidor y la medida. 
+
+* Una observación es un conjunto de medidas hechas bajo condiciones similares (uno usualmente hace todas las medidas en una observación al mismo tiempo y en el mismo objeto). Una observación contendrá muchos valores, cada uno asociado a una diferente variable. Nosotros muchas veces nos referiremos a una observación como un punto de datos o una instancia.
+
+###3. Variacion
+
+Variación es la tendencia de los valores de una variable por cambiar de medición en medición. En finanzas uno puede ver variacion en muchas maneras, por ejemplo con la evolución de una compañía: número de empleados, sector que pertenece, valor a mercado entre otras. Mucho del análisis cuantitativo en finanzas se basa en medir la variación del rendimiento de los precios de acciones, bonos, commodities y derivados, entre otros; y a partir de estos obtener señales que te permitan realizar estrategias de inversión o administración de riesgos. 
+
+###4. Visualizando Distribuciones
+
+Cómo visualizar distribuciones de una variables dependerá si la variables es categórica o continua. Una variable es categórica si solo puede tomar un pequeño conjunto de valores. Como lo platicamos anteriormente, en R variables categóricas son usualmente almacenadas como factores; pero también pueden ser vectores de caracteres.  
+
+A continuación se muestra cómo graficar la distribución de los países de domicilio de las compañías en nuestra base. Como modo ilustrativo mostramos el top 8 de paises.
+
+
+```{r}
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+
+comp_profile<-read.csv('dataset/dataset_comp_profile.csv')
+
+#Obtener countries con mayor numero de compañias, top 8
+count_comp_country <- head(comp_profile %>%count(Country) %>% arrange(desc(n)), 8)
+
+# Gráficar la distribución de top 8 compañias
+ggplot(data = filter(comp_profile, Country%in% count_comp_country$Country)  ) +
+  geom_bar(mapping = aes(x = Country))
+```
+
+Una variable es continua si puede tomar cualquier valor de un conjunto infinito. Precios y fecha-tiempo son dos ejemplos de variables continuas. Para examinar la distribución de una variable continua, usa un histograma:
+
+```{r}
+
+sec_prices<-read.csv('dataset/data_sec_prices.csv')
+ggplot(data = sec_prices) +
+  geom_histogram(mapping = aes(x = Close), binwidth = 20)
+```
+
+Tu puedes realizar esto manualmente combinando dplyr::count()  ggplot2::cut_width():
+
+```{r}
+sec_prices %>% 
+  count(cut_width(Close, 20))
+```
+
+Un histograma divide el eje x en cajones de igual espaciado  y después usa el largo de una barra para mostrar el número de observaciones que caen en cada cajón. En la gráfica de anterior, el barra más alta muestra que casi 800 observaciones tienen un precio entre 10 y 30, que son los bordes derechos e izquierdos de las barras. 
+
+Uno puede ajustar el ancho de los intervalos de un histograma con el argumento binwidth. 
+
+###5. Summaries
+
+Otra herramienta muy útil para el análisis exploratorio de datos son los summaries. Estos nos ayudan a generar reportes agregados de estadísticas que pueden ser muy importantes para presentar resultados, identificar si nuestra información tiene errores o para analizar si contamos con la información suficiente para implementar modelos de mayor complejidad. Los summaries siempre van acompañados de funciones que se aplican a variables para agregar la información.
+
+```{r}
+sec_prices<-read.csv('dataset/dataset_sec.csv')
+
+
+### Agrupar precios actuales por moneda
+sec_prices_exchange <- group_by(sec_prices, financialCurrency)
+
+### Aplicar max, min y mean a variables current price
+summarize(sec_prices_exchange, count = n(), max_price= max(currentPrice), min_price= min(currentPrice), mean_price= mean(currentPrice, na.rm = TRUE)) 
+
+```
+
+###6. Valores Inusuales
+Outliers son observaciones que son inusuales; datos que no parecen ajustarse a algun patron. Algunas veces estos valores inusuales son errores en el registro de los datos; otras veces estos son señales que requieren una particular investigación.
+
+###7. La Variable Precio y Rendimiento
+El análisis de los precios de mercado de los activos financieros es uno de los temas más preponderantes en finanzas. Los precios son medidos en diferentes frecuencias, y naturalmente forman una serie de tiempo. 
+
+Las frecuencias comúnmente establecidas para medir el precio son: días, semanas y meses. Las series de tiempo diarias y mensuales son en las que nos enfocaremos principalmente durante el curso; sin embargo, es importante hablar un poco de otras frecuencias que te podrás encontrar en el ámbito laboral y académico:
+
+* Frecuencia Intradía: Existen frecuencias mayores para medir los activos financieros. Este tipo de series de tiempo son llamadas intradía, y miden la evolución del precio cada segundo, minuto u hora. Las series de tiempo intradía son ampliamente usadas por Hedge Funds, donde buscan generar ganancias pequeñas pero más frecuentes. A las finanzas dedicas al estudio de precios intradía se les llama Finanzas de Alta Frecuencia (High Frecuency Finance).
+
+
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/intraday_price.jpg")
+```
+
+* Frecuencia en el limite (Libro de Órdenes): Es posible hacer un zoom mayor a la frecuencia intradía y analizar la serie de tiempo de los precios considerando el libro de órdenes. El libro de órdenes contiene toda la información de compradores y vendedores interesados en un activo en particular. El libro de órdenes es la frecuencia límite para analizar los precios puesto que la evolución de estos depende de la actividad de compra y venta de los inversionistas (libro de órdenes). La frecuencia de libro de Órdenes tiene un espaciado irregular con respecto al tiempo, ya que los inversionistas pueden negociar en cualquier momento los activos bursátiles. 
+  
+```{r, out.width = "400px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("./img/order_book.jpg")
+```
+
+* Frecuencia con base en eventos (tiempo Intrínseco): En lugar de medir el activo financiero con base en un reloj físico: horas, días, meses. El tiempo intrínseco busca analizar la serie del tiempo con base en eventos que afectan la evolución del activo subaycente. Estos eventos pueden ser la llegada de noticias, el volumen negociado o anomalías detectadas en el mercado. 
+
+
+###7.1 Análisis Exploratorio del Rendimiento de Acciones
+En el ámbito cuantitativo, normalmente es más importante enfocarse en el estudio de los rendimientos, los cuales tienen propiedades estadísticas que pueden ser analizadas.
+
+Para esta sección usaremos las herramientas desarrolladas por quantmod y TTR. Estos paquetes son ampliamente utilizados por la comunidad cuantitativa e integran los mejores recursos para recolectar y analizar datos financieros. 
+ 
+Normalmente cuando descargamos datos de acciones, nosotros obtenemos series históricas de precios con frecuencia diaria (series de tiempo diarias). Subsecuentemente, uno tiene que obtener los rendimientos y a partir de ahí generar análisis estadísticos. 
+
+El paquete quantmod te permite bajar precios históricos con el símbolo de la acción. La función getSymbol regresa un objeto xts, que son objetos de tipo series de tiempo, con datos de precios  diarios. 
+
+```{r}
+options("getSymbols.yahoo.warning"=FALSE)
+
+suppressMessages(library(TTR))
+suppressMessages(library(quantmod))
+
+#### Obtener precios de Apple
+precios_apple<- getSymbols('AAPL' ,auto.assign=FALSE)
+
+#### Variables en nuestro objeto xts
+colnames(precios_apple )
+
+#### Select AAPL.Close column
+precios_apple<- precios_apple[,'AAPL.Close']
+```
+
+Quantmod incluye funciones que te permiten obtener el rendimiento periódico de los precios. Existen dos maneras de calcular los rendimientos:
+
+* aritmético (discreto): $$\frac{r_t - r_{t-1}}{r_{t-1}}$$
+* log (continuo): $$\log(\frac{r_t}{r_{t-1}})$$
+
+
+```{r}
+#### Rendimientos diarios usando funcion dailyReturn y log (continous return)
+returns_apple<- dailyReturn(precios_apple, type='log' )
+
+### movimientos periodicos usando la función periodReturns con dos argumentos.
+returns_apple<- periodReturn(precios_apple, period='daily', type='arithmetic')
+
+returns_apple_monthly<- periodReturn(precios_apple, period='monthly', type='arithmetic')
+```
+
+Podemos gráficar la distribución de los rendimientos usando:
+
+```{r}
+returns_apple %>%    
+    ggplot(aes(x = daily.returns)) + 
+    geom_histogram(bins = 100) + 
+    geom_density() +
+    geom_rug(alpha = 0.5) 
+
+returns_apple_monthly %>%    
+    ggplot(aes(x = monthly.returns)) + 
+    geom_histogram(bins=30) + 
+    geom_density() +
+    geom_rug(alpha = 0.5) 
+
+```
+
+Y examinar la distribución de los rendimientos usando la función quantile()
+
+```{r}
+probs <- c(.005, .025, .25, .5, .75, .975, .995)
+
+dist_returns <- returns_apple %>% 
+    quantile(probs = probs, na.rm = TRUE)
+
+dist_returns
+```
+
+
+La desviación estándar es una medida estadística que mide cuánto se dispersan los valores en torno a su promedio. En el ámbito financiero, la desviación estándar o volatilidad de los rendimientos de un precio representa el riesgo de inversión en una acciòn.
+
+```{r}
+#### Calcular volatilidad
+sd(returns_apple)
+```
+
+Muchas veces es útil transformar tu objeto de serie de tiempo en un dataframe, esto con la finalidad de realizar las transformaciones que hemos discutido en las clases anteriores. 
+
+
+```{r}
+suppressMessages(library(lubridate))
+
+### Transformar objeto xts a data frame
+returns_apple<- as.data.frame(returns_apple)
+returns_apple$date<- row.names(returns_apple)
+row.names(returns_apple)<- NULL
+returns_apple$year<- year(returns_apple$date)
+
+returns_apple <- group_by(returns_apple, year)
+
+### Aplicar max, min y mean a variables current price
+summarize(returns_apple, count = n(), max_return= max(daily.returns), min_return= min(daily.returns), mean_return= mean(daily.returns, na.rm = TRUE), vol= sd(daily.returns))
+
+```
