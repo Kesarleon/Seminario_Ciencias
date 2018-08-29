@@ -1,0 +1,94 @@
+---
+title: "Tarea 2"
+author: "Maria L Zamora y Ali Limon"
+due date: "Septiembre 12, 2018. 12:00 a.m."
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+## Introducción
+El objetivo de esta tarea es aprender cómo manipular series de tiempo relacionadas a precio de acciones de empresas que cotizan en el mercado. Para este ejercicio nos enfocaremos en la empresa más grande de Estados Unidos: Apple, cuyo ticker es AAPL.
+
+Para esta tarea usaremos una plataforma de datos llamada *Quandl* , que es muy famosa entre analistas financieros y de inversión. En esta plataforma podrás encontrar datos financieros, económicos y alternativos útiles para realizar análisis financiero cuantitativo. Para obtener acceso total a las bases de datos se necesita una cuenta premium; sin embargo, también es posible tener acceso gratuito a una muestra de la información por medio de la API. Para este ejercicio usaremos la API para obtener precios de acciones financieras y deberás resolver lo que se te pide. 
+
+Primero que nada obten una cuenta *gratuita* con tu correo de estudiante en el website.
+
+https://www.quandl.com/
+
+Esto te permitirá obtener un API key que es necesaria para descargar información usando una paquetería llamada Quandl. Puedes conocer tu key accediendo a ACCOUNT SETTINGS > API KEY
+
+Finalmente, instala el paquete *Quandl* disponible en R.
+
+https://cran.r-project.org/web/packages/Quandl/Quandl.pdf
+
+Ademas deberas instalar la paqueteria Quantmod y TTR que es una paquetería diseñada para utilizar herramientas de Finanzas Cuantitativas.
+
+## Construyendo el Dataset
+
+Utiliza la funcion:
+
+Quandl("EOD/Ticker", api_key=XXXXXXXXXXX) con tu api_key para obtener los precios historicos de tu empresa.
+
+1) Filtra precios cuya historia sea despues del año 2000 y selecciona el precio de cierre.
+
+Este será el dataset que usaras para este ejercicio. 
+
+## I. Distribución de los Rendimientos
+
+## Cálculos (30 pts)
+
+2) Convierte tu dataframe en un objeto de serie de tiempo: xts
+
+3) Calcula el rendimiento aritmético diario, semanal, mensual y por trimestre de tu serie de tiempo. 
+
+## Discusión (20 pts)
+
+4) Compara la distribución de tus rendimientos de cada frecuencia con una distribución Normal cuyos parámetros son la media de tu distribuciones y la varianza. Así mismo, aplica un test de normalidad en la distribución que creaste. Y discute sobre lo siguiente:
+
+¿Qué tan bueno sería hacer un supuesto de distribución normal para retornos financieros?
+
+
+# II. Crear estructuras de datos en R (20 pts)
+
+## Dictionaries
+Durante la clase de tipos y estructuras de datos, explicamos los tipos de datos simples (lógicos, enteros, decimales y texto) en R y en Python. Más tarde, fueron mostradas las estructuras de datos principales en ambos lenguajes. De manera particular, definimos los diccionarios en Python. En esta tarea, el reto es mostrar el codigo de un diccionario en R con el fin de conocer el funcionamiento de estas estructuras. Este diccionario debe tener el mismo funcionamiento que un diccionario de python y para esto deberás seguir los siguientes pasos: 
+
+1) Crear un diccionario en Python
+
+2) Incluir los datos de Apple (AAPL) en el diccionario, las llaves (key) serán definidas con el año y el valor (value) correspondiente será la lista de precios de ese año.
+
+3) Crear el mismo diccionario en R e incluir los datos
+
+
+# III. Estadísticos descriptivos R (30 pts)
+
+## Summaries
+En esta fase de la tarea la idea es empezar a trabajar con un análisis de los datos que tenemos, así como desarrollar el uso de funciones tanto en Python como en R.
+
+4) En Python: Usar el diccionario para hacer una subselección de las llaves que correspondan a los años después de 2005 y transformar los datos de un diccionario a un dataframe (columnas: fecha, precio)
+
+5) En R: Usar el diccionario para hacer la misma subselección y transformar a un dataframe (columnas: fecha, precio) 
+
+6) Calcular en cada lenguaje (R y Python) los siguientes estadísticos descriptivos de los rendimientos anual: Conteo, media, desviación estandar, valor minimo y máximo.
+
+7) ¿Qué datos parecen inusuales? ¿Porqué crees que sucede esto? 
+
+
+# Formato de la tarea
+Esta tarea deberá ser presentada en formato HTML y Rmd (R markdown), incluyendo código y sus correspondientes explicaciones. En medida de lo posible, trabajen en no repetir código, hagan uso de funciones que puedan ser llamadas de manera repetida. Mucha suerte!
