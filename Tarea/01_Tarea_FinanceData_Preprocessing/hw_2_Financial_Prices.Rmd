@@ -1,7 +1,7 @@
 ---
 title: "Tarea 2"
 author: "Maria L Zamora y Ali Limon"
-due date: "Septiembre 12, 2018. 12:00 a.m."
+date: "Deadline: Septiembre 11, 2018. 11:59 p.m."
 output:
   html_document: default
   pdf_document: default
