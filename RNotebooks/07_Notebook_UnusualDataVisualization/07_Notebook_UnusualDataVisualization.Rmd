@@ -244,9 +244,15 @@ ggplot(data = mexComp) +
 ############### Pairs of numeric variables
 varMexComp <- c('fullTimeEmployee','currentPrice','totalRevenue','totalDebt','sharesOutstanding','marketCap','leverageEbitda')
 pairs(mexComp[varMexComp])
+mexCompNumeric <- mexComp[varMexComp]
 
-log_varMexComp <- c('log_fullTimeEmployee','log_currentPrice','log_totalRevenue','log_totalDebt','log_sharesOutstanding','log_marketCap','leverageEbitda')
+log_varMexComp <- c('log_fullTimeEmployee','log_currentPrice','log_totalRevenue','log_totalDebt','log_sharesOutstanding','log_marketCap','log_leverageEbitda')
 pairs(mexComp[log_varMexComp])
+mexCompLogNumeric <- mexComp[log_varMexComp]
+
+##### avoid +/- Inf
+mexCompLogNumeric  <- mexCompLogNumeric [is.finite(rowSums(mexCompLogNumeric )),]
+nrow(mexCompLogNumeric )
 
 ```
 
@@ -287,10 +293,10 @@ No necesariamente los vamos a encontrar todos durante esta etapa, es probable qu
 
 
 ```{r}
-mexComp <- mexComp[-115,]
+#mexComp <- mexComp[-115,]
 
 ############### Diagnostics using linear models
-reg <- lm(log_currentPrice~log_totalRevenue+log_fullTimeEmployee+log_leverageEbitda, mexComp)
+reg <- lm(log_currentPrice~log_totalRevenue+log_fullTimeEmployee+log_leverageEbitda, mexCompLogNumeric )
 par(mfrow=c(3,2))
 plot(reg, which=1:2)
 plot(reg, which=3:4)
