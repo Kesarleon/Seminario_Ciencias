@@ -1,0 +1,286 @@
+---
+title: "Análisis de Texto"
+author: "Maria L Zamora y Ali Limon"
+date: "Septiembre 4, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+##1. Introducción
+En las clases anteriores hemos aprendido a procesar y explorar datos estructurados. Este tipo datos tienen un alto grado de organización y permiten ser explotados con mayor facilidad. Sin embargo en la vida real, gran parte de los datos no existen de una forma estructurada pero sí como documentos y texto. El análisis de texto ha tomado un gran papel en diferentes campos de la ciencia en los últimos años. En finanzas, el análisis de texto es aplicado a noticias, registros oficiales y reportes financieros con el fin de obtener información de manera sistemática y automática que permite crear señales para inversión de capitales y administración de riesgos.
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/structure_unstructure.jpg")
+```
+
+En las siguientes dos clases nos enfocaremos a revisar las  herramientas básicas usadas para el procesamiento, limpieza y transformación de texto. 
+
+
+##2. Basicos de String
+La manipulación de strings es la base para aprender a analizar texto. El propósito de esta sección es revisar las principales funciones que aplican a los strings: 
+
+```{r}
+### 1) Crear String
+# Siempre se recomienda usar "" También se utiliza '' 
+string1<- "esto es una cadena"
+
+#### 2) Caracteres especiales
+# El carácter diagonal invertida (\) es usado para tratar caracteres especiales como nueva línea (\n), la diagonal por sí misma (\) y comillas ("\""). Cuando uno hace uso de la diagonal para representar un carácter especial se le llama secuencia de escape.
+
+#Para incluir un comillas debes usar escape \
+double_quote <- "\"" # or '"'
+single_quote <- '\'' # or "'"
+
+### 3) Imprimir in string
+# Se recomienda usar writeLines
+# Print no representa exactamente al string
+writeLines(c("\"", "\\"))
+print(c("\"", "\\"))
+
+### 4) Otros caracteres espaciales
+# \n
+string1<- "ciencia de datos \n y \n finanzas"
+writeLines(string1)
+
+string1<- "ciencia de datos y finanzas"
+writeLines(string1)
+
+### 5) Puedes checar toda la lista de caracteres especiales usando ?'"' en la terminal
+
+### 6) Listas de Strings 
+# Multiples strings pueden ser almacenados en un vector character 
+c("uno", "dos", "tres")
+
+### 7) Principales funciones para manipulación de Strings
+# Usaremos stringr, pero R tiene funciones base que realizan tareas similares
+suppressMessages(library(stringr))
+
+### 7.1) Longitud de un String
+str_length(c("a", "R para ciencia de datos", NA))
+
+### 7.2) Colapsar lista de strings en un solo string
+str_c("x", "y", "z")
+str_c("x", "y", sep = ".")
+
+### 7.3) Tomar subconjuntos de string
+x <- c("Bono", "Derivado", "Accion")
+str_sub(x, 1, 3)
+
+### 7.4) Pasar a minusculas un string
+str_to_lower("CIENCIA DE DATOS")
+
+### Pasar a mayusculas
+str_to_upper("ciencia de datos")
+```
+## 3. Expresiones Regulares
+Una expresión regular es una secuencia de caracteres que definen un patrón de búsqueda. Habitualmente, este patrón es utilizado por algoritmos de búsqueda de strings con la finalidad de realizar operaciones de "find" o "find and replace". La expresiones regulares son ampliamente usadas para procesar texto y, de manera mas general, análisis de strings. Dentro de las aplicaciones más comunes se incluye: validación de datos, web scraping, data wrangling y parsing.  
+
+Para aprender expresiones regulares, usaremos str_view () y str_view_all (). Estas funciones toman un vector de caracteres y una expresión regular, y posteriormente muestran la manera en que coinciden. Comenzaremos con expresiones regulares muy simples y luego gradualmente nos volveremos más y más complicados. 
+
+
+1) Encontrar patrones que empaten con strings exactos
+```{r}
+suppressMessages(library(htmlwidgets))
+x <- c("manzana", "platano", "pera")
+str_view(x, "an")
+```
+
+2) Encontrar patrones que empaten con strings exactos anclando además un carácter
+
+```{r}
+str_view(x, ".a.")
+```
+
+3) Debido a que en una expresión regular el . encuentra cualquier carácter, se necesita hacer un escape para decirle a las regex que queremos encontrar exactamente ese carácter y no usar su comportamiento especial. En expresiones regulares el escape se logra al incluir dos diagonales invertidas:
+
+```{r}
+str_view(c("abc", "a.c", "bef"), "a\\.c")
+```
+
+
+3.1) En el caso especial de una regex que encuentre \\ uno necesitaria "\\\\\\\\". Esto es 
+
+
+```{r}
+# Definir un string que incluye \ (escape \)
+x <- "a\\b"
+writeLines(x)
+# Encontrar \ Esto es \\ (escape de la regex) + \\ (escape del string)
+str_view(x, "\\\\")
+```
+
+### 3.1 Anchors
+Por defecto, expresiones regulares encontraran cualquier parte de un string. Sin embargo, también es útil anclar una expresión regular de tal manera que pueda encontrar sol el inicio o el fin de un string. Tu puedes usar:
+
+* ^ para encontrar el inicio de un string 
+* $ para encontrar el final de un string
+
+```{r}
+str_view(c("arbol", "manzana", "pera"), "^a")
+```
+
+```{r}
+str_view(c("arbol", "manzana", "pera"), "a$")
+```
+
+```{r}
+x <- c("manzana dulce", "manzana", "pastel de manzana")
+str_view(x, "manzana")
+str_view(x, "^manzana$")
+```
+
+### 3.2 Clases Caracter y alternativas
+Similar al ejemplo que vimos anteriormente con . existe un número de patrones especiales que encuentran más de un carácter. Las cuatro herramientas más útiles son:
+
+* "\\d" encuentra cualquier digito
+* "\\s" encuentra cualquier espacio en blanco
+* [abc] encuentra a, b o c
+* [^abc] encuentra cualquiera excepto a, b o c
+
+Las ultimas dos herramientas corresponden a una clase caracter y funcionan tambien como alternativa a los escapes de diagonal invertida.
+
+```{r}
+str_view(c("abc", "a.c", "a*c", "a c"), "a[.]c")
+str_view(c("ab c", "a.c", "a*c", "a c"), "\\s")
+str_view(c("ab99", "a.c", "a*c", "a c"), "\\d\\d")
+```
+
+
+### 3.3 Repetición
+La siguiente herramienta es útil para controlar el número de veces que un patrón debe ser encontrado. 
+
+* ?: 0 or 1
+* +: 1 or more
+* *: 0 or more
+
+```{r}
+str_view("MDCCCLXXXVIII", "CC?")
+str_view("MDCCCLXXXVIII", "CC+")
+str_view("MDCCCLXXXVIII", 'C[LX]+')
+```
+
+## 4. Similaridad de Strings
+
+En esta sección revisaremos los algoritmos más comunes para determinar la distancia entre dos strings. 
+
+### 4.1 Similaridad entre palabras
+
+* Hamming: Número de posiciones con el mismo símbolo en ambos strings. Solamente definido para strings de la misma longitud.
+
+* Levenshtein distance: Numero minimo de inserciones, eliminaciones, reemplazos necesitados para convertir el string a en b.
+
+* Damerau–Levenshtein distance: Similar a Levenshtein pero incluye transposiciones dentro de las posibles operaciones
+
+
+```{r}
+library(stringdist)
+
+### Hamming 
+stringdist("ABD","ABC",method="hamming")
+
+### Levenshtein 
+## CA -> (1) A -> (2) AB -> (3) ABC 
+stringdist("CA","ABC",method="lv")
+
+### Damerau–Levenshtein 
+## CA -> (1) AC -> (2) ABC
+stringdist("CA","ABC",method="dl")
+
+```
+
+### 4.2 Similaridad entre oraciones
+
+Para explicar las siguientes medidas de similaridad es importante definir lo que es el n-gram. 
+
+N-grams de textos son ampliamente usados en minería de datos y natural language processing. Estos son básicamente un conjunto de co-ocurrencias de palabras dentro de una ventana predefinida. Para obtener los N-grams uno típicamente va tomando palabras subsecuentes. Para el caso base, cuando n=1, los N-grams están definidos por las palabras que conforman la oración. Por ejemplo, para la oración: "Las acciones se derrumbaron esta mañana, pese a la baja en las tasas de interés por parte de la Reserva Federal".
+
+con N=1 los N-grams serían:
+
+```{r}
+
+suppressMessages(library(tibble))
+suppressMessages(library(tidytext))
+suppressMessages(library(dplyr))
+suppressMessages(library(data.table))
+ 
+x <- tribble(
+  ~key, ~val_x,
+     1, "Las acciones se derrumbaron esta mañana, pese a la baja en las tasas de interés por parte de la Reserva Federal"
+)
+
+unigram<- unnest_tokens(x, unigram, val_x, token = "ngrams", n = 1)
+print(unigram)
+```
+
+con N=2 los N-grams serían:
+
+```{r}
+bigram<- unnest_tokens(x, bigram, val_x, token = "ngrams", n = 2)
+print(bigram)
+```
+
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+     'string1', "Las acciones se derrumbaron esta mañana, pese a la baja en las tasas de interés por parte de la Reserva Federal",
+      'string2', "Las acciones no se derrumbaron esta mañana, pero se espera que la Reserva Federal baje las tasas de interés"
+)
+
+unigram<- unnest_tokens(x, unigram, val_x, token = "ngrams", n = 1)
+unigram<- unigram %>%  count(key, unigram)
+
+unigram<- dcast(unigram,  unigram ~key, value.var='n')
+unigram$key<- NULL
+unigram[is.na(unigram)]<- 0
+```
+
+* q-gram distance: Suma de diferencias absolutas entre los N-grams (vectores) de dos strings.
+
+* Cosine distance: Definida con la siguiente formula
+$$\frac{\sum_{i=1}^{n}A_i \cdot B_{i} }{\sqrt{\sum_{i=1}^{n}A_i} \cdot \sqrt{\sum_{i=1}^{n}B_i}}$$
+
+* Jaccard distance: longitud de la intersección de los N-grams dividido por la longitud de la union de los N-grams.
+
+$$ J(A,B)=\frac{|A∩B|}{|A∪B|}$$
+
+```{r}
+q_gram_dist<- sum(abs(unigram$string1- unigram$string2))
+print(q_gram_dist)
+
+### Similaridad coseno
+cos_sim <- function(a, b) {
+    sum(a*b) / (sqrt(sum(a*a)) * sqrt(sum(b*b)))
+ }
+
+## 1 - similaridad coseno
+cosine_dist<- cos_sim(unigram$string1, unigram$string2)
+print(cosine_dist)
+
+### Similaridad Jaccard
+## Intersección, 
+ngram_intersection<-nrow(filter(unigram, string1!= 0 & string2!=0))
+## Unión
+ngram_union<- nrow(unigram)
+
+jaccard_dist<-(ngram_intersection/ngram_union)
+print(jaccard_dist)
+```
