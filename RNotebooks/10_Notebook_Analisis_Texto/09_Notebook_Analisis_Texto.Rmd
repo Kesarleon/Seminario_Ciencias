@@ -1,0 +1,253 @@
+---
+title: "Análisis de Texto"
+author: "Maria L Zamora y Ali Limon"
+date: "Septiembre 6, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+##1. De Texto a Datos Numéricos
+Los datos de texto requieren una preparación especial antes de poderlos usar en tus modelos. En esta clase discutiremos las principales herramientas para procesar texto y lo pasos básicos para transformar el cuerpo de un texto en un conjunto de datos que puede alimentar un algoritmo de minería de datos. 
+
+##2. Terminología y estructuras de texto
+Es muy importante definir algunos términos en los que se basa el análisis de texto. 
+
+* Un token es una unidad de texto significativa que estamos interesados en usar para el análisis. Normalmente los tokens son palabras, pero también pueden incluir números o puntuación.  
+
+* Tokenización es el proceso de dividir el texto dentro de tokens.
+
+* Un documento es una pieza de texto, no importa que tan largo o pequeño sea. Un documento puede ser una oración, un reporte de 100 páginas, o inclusive comentarios de youtube o facebook. Un documento está compuesto por tokens o términos.
+
+* Un corpus es una colección de documentos. 
+
+Existen diferentes estructuras de datos que se utilizan para almacenar el texto. 
+
+* String. El texto puede ser almacenado como strings o vectores de caracteres. En R normalmente los datos de texto son leídos dentro de la memoria de esta forma. 
+
+* Corpus (Objeto). Este tipo de objetos típicamente contienen string no procesados anotados con metadata y detalles adicionales. Un corpus comúnmente está conformado por una colección de documentos. 
+
+* Document-term matrix: Esto es una matriz esparsa describiendo una colección de documentos con renglones para cada documento y columnas para cada término. 
+
+* One-token-per-row structure: Estas estructuras de datos buscan almacenar el texto considerando un token por renglón. Muchas veces estas estructuras son combinadas con metadata de la base para formar one-token-per-document-per-row.
+
+##3. Base de Datos
+Para esta clase usaremos un par de tablas de la base de datos global companies. 
+
+* company description:contiene la descripción del negocio de cada empresa. 
+
+* company industry: que contiene el sector en industria de cada compañía.
+ 
+
+```{r}
+suppressMessages(library(dplyr))
+
+company_desc<- read.csv('dataset/dataset_comp_descr.csv')
+company_industry<- read.csv('dataset/dataset_comp_industry.csv')
+
+dataset_company<- left_join(company_desc, company_industry, by='comp_id' )
+dataset_company$LongBusinessSummary<- as.character(dataset_company$LongBusinessSummary)
+
+head(dataset_company, 1)
+```
+Al leer esta base y hacer el join podemos decir que formamos un corpus, con strings que no han sido procesados y anotaciones adicionales como el id de la compañía, sector e industria. En este caso cada compañía forma un documento y el conjunto de documentos es el corpus mismo.  Es importante notar que los documentos pueden ser vinculados a las compañías, sectores o industrias. 
+
+
+### 3. Practicas comunes de preprocesamiento de texto. 
+Existen diferentes técnicas que pueden ser útiles para transformar tu texto original en un valor de entrada más adecuado para realizar el análisis o aplicar modelos. Estas técnicas pueden categorizarse de la siguiente forma:
+
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/textprepro.jpg")
+```
+
+## 3.1  Remover Ruido:
+Remover ruido del texto puede traducirse como filtrar partes del texto que no son útiles para la tarea que quieres realizar. Esto es un paso que depende totalmente del problema que se quiere resolver. Por ejemplo, en la mayoría de los casos los pies de página, títulos o referencias dentro de los documentos no tienen ningún valor agregado. Remover ruido es comúnmente aplicado a la hora de analizar documentos HTML o XML, donde existen componentes del archivo que se necesitan evitar.
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/noiseremoval.jpg")
+```
+
+## 3.2  Tokenizacion.
+Tal como lo platicamos anteriormente, tokenización es el paso de dividir string largos (texto) en piezas más pequeñas (tokens). Tokenización es también referido como segmentación de texto.
+
+## 3.3 Normalizacion. 
+
+La normalización en general se refiere a una serie de tareas relacionadas destinadas a poner todo el texto en igualdad de condiciones, a continuación las técnicas más comunes de normalización:
+
+* Remover Puntuación. Generalmente se prefiere trabajar con textos que no incluyan puntuación, debido a que las palabras no cambian su significado al tener un punto o una coma. 
+
+* Reemplazar dígitos por una palabra predefinida. Los números pueden tomar un número infinito de valores, esto hace que el análisis de texto pueda tener una complejidad mayor si se mantienen las cantidades originales sin tener un verdadero valor agregado en el entendimiento del texto. La mayoría de las veces se prefiere simplificar el texto reemplazando los dígitos por una palabra predefinida. ('Apple Inc. was founded in 1977.' -> 'Apple Inc. was founded in DIGITO.')
+
+* Convertir todas las palabras a Minúsculas (Mayúsculas). Convertir todas las palabras es una práctica muy común para poder hacer más homogéneo el texto.
+
+* Remover Stopwords. Stopwords son palabras que no son útiles para el análisis de texto dado que estas son extremadamente comunes en en el lenguaje. Las listas de stopwords cambian de lenguaje en lenguaje y existen diferentes listas predefinidas dependiendo el problema a resolver. Sin embargo, las listas de stopwords normalmente contienen palabras 1) determinantes 2) Conjunciones coordinantes 3) Preposiciones.
+
+* Stem (lexema). El "Stemming" es un algoritmo de reducción de una palabra a su raíz o “stem”. Es muy útil en aplicaciones o funcionalidad de recuperación de información (los buscadores como Google usan este mecanismo), pensemos al buscar por el término “familia” usando una búsqueda exacta perderíamos documentos donde aparecen los términos “familiar”, “familias”, etc. El “Stemming” reduce los términos mencionados a la raíz “famili”, por lo que la búsqueda se hace bastante más precisa.
+
+##4. One-token-per-document-per-row.
+Para estudiar los enfoques que existen para representar el texto, usaremos el tipo de estructura de datos llamado One-token-per-document-per-row. Esta estructura transforma los documentos en un dataframe que contiene un token (palabra) por renglón. La representación además preserva otro tipo de información que caracterizan a los documentos de entrada. La paqueteria tidytext incorpora este tipo de estructuras y otras funciones útiles para el procesamiento y análisis de texto.
+
+
+```{r}
+suppressMessages(library(tidytext))
+dataset_token<- dataset_company %>% unnest_tokens( word, LongBusinessSummary)
+head(dataset_token)
+
+```
+
+Los dos argumentos básicos usados aquí son nombres de columnas. Primero tenemos el nombre de la columna que será creada como resultado de descomponer el texto en palabras (word, en este caso), y como segundo argumento el texto que queremos descomponer en palabras (LongBusinessSummary, en este caso).
+
+Después de aplicar la función unnest_tokens en el dataset original (dataset_company), cada renglón con texto es dividido de tal manera que se despliega un token por renglón en el dataset de salida (dataset_token). Así mismo, podemos notar lo siguiente:
+
+* Otras columnas que caracterizan los documentos de entrada son conservadas: id de la compañía, sector e industria.
+ 
+* La puntuación ha sido filtrada
+
+* Por default, unnest_tokens() convierte los tokens a minúsculas, lo cual hace más fácil su comparación con otros datasets. (to_lower=FALSE te permite preservar mayúsculas) 
+
+Los dos últimos puntos se refieren a técnicas de preprocesamiento de datos, que revisamos en la sección anterior. Para seguir analizando nuestros documentos, también filtraremos las stopwords y los dígitos. Para lo primero, usaremos la lista de stopwords que incluye tidytext, filtrando las palabras de nuestro dataset_token que se encuentren en esta lista. Subsecuentemente, utilizamos una expresión regular para filtrar todos los dígitos de la tabla. 
+
+
+```{r}
+library(stringr)
+data(stop_words)
+
+print(paste0('El número de renglones del dataset con stopwords es: ',nrow(dataset_token)))
+
+dataset_token <- filter(dataset_token, !word %in% stop_words$word)
+dataset_token <-  filter(dataset_token, !str_detect(word, "\\d"))
+
+print(paste0('El número de renglones del dataset sin stopwords es: ',nrow(dataset_token )))
+
+```
+```{r}
+suppressMessages(library(ggplot2))
+
+#### Contar el número de palabras en nuestro dataset (descripción de compañías).
+### Graficar las más comunes
+
+dataset_token %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 5000) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+##6. Bag of Words
+Es importante mantener en mente que el principal propósito de la representación de texto, es tomar un conjunto de documentos y convertirlos en vectores de features. Cada documento es una instancia de la cual no se sabe de antemano qué features tendrá. El enfoque de bag of words, trata a cada documento como una colección de palabras individuales. Este ignora gramática, orden de palabras y estructura de la sentencia. El enfoque trata cada palabra de un documento como una keyword potencialmente importante de un documento.
+
+Entonces, si cada palabra es una posible feature, 
+
+¿Cuál será el valor de cada features en un documento dado?
+
+Existen muchos posibles caminos para contestar esta pregunta. En el más básico, cada palabra es un token, y cada documento está representado por uno (si el token está presente en el documento) o cero (el token no está presente en el documento)
+
+(1) John likes to watch movies. 
+(2) John also likes to watch football games.
+
+BoW1 = {"John":1,"likes":1,"to":1,"watch":1,"movies":1};
+
+BoW2 = {"John":1,"also":1,"likes":1,"to":1,"watch":1,"football":1,"games":1};
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/bow_1.jpg")
+```
+
+
+##6.1. Frecuencia de Palabras
+El siguiente paso es usar el conteo de palabras (frecuencia) en el documento en lugar de simplemente un cero o uno. Un bag of words puede ser entonces definido de esta manera:
+
+(1) John likes to watch movies. Mary likes movies too.
+(2) John also likes to watch football games.
+
+BoW1 = {"John":1,"likes":2,"to":1,"watch":1,"movies":2,"Mary":1,"too":1};
+
+BoW2 = {"John":1,"also":1,"likes":1,"to":1,"watch":1,"football":1,"games":1};
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/bow_2.jpg")
+```
+
+El análisis de frecuencias de palabras es una tema muy importante en análisis de texto. Para este ejercicio compararemos las frecuencias con base en los sectores de las compañías, es decir analizaremos la diferencia de las descripciones de compañías de los siguientes sectores. 
+
+
+* Industrials       
+* Financial Services  
+* Technology            
+
+
+```{r}
+suppressMessages(library(wordcloud))
+
+### Filtrar compañias con sector Industrials. El conjunto de las descripciones de las compañias sera nuestro documento asociado a Industrials.
+
+### El corpus en este caso seran los documentos de Industrials, Financial Services y Technology
+
+
+dataset_token_ind<- dataset_token %>% filter(Sector=='Industrials') %>% count(Sector, word) %>% group_by(Sector) %>%
+  mutate(proportion = n / sum(n))
+
+
+dataset_token_fin<- dataset_token %>% filter(Sector=='Financial Services') %>% count(Sector, word) %>% group_by(Sector) %>%
+  mutate(proportion = n / sum(n))
+
+dataset_token_tech<- dataset_token %>% filter(Sector=='Technology') %>% count(Sector, word) %>% group_by(Sector) %>%
+  mutate(proportion = n / sum(n))
+
+### WorldCloud te permite graficar palabras, donde el tamaño de cada plabra es directamente proporcional a la frecuencia. 
+wordcloud(words = dataset_token_ind$word, freq = dataset_token_ind$n, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"), scale=c(4,.01))
+
+wordcloud(words = dataset_token_fin$word, freq = dataset_token_fin$n, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"), scale=c(4,.01))
+
+wordcloud(words = dataset_token_tech$word, freq = dataset_token_tech$n, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"), scale=c(4,.01))
+```
+
+##6.2 Analizando frecuencia de palabras y Documentos.
+En la sección anterior analizamos y comparamos las descripciones de las compañías con base en el sector en el que se encuentran y usando frecuencia de las palabras (term frequency: tf). Sin embargo como vimos en las gráficas, existen palabras que aparecen múltiples veces pero que pudieran no ser importantes para identificar diferencias debido a que aparecen en todos los documentos. 
+
+Existe otra metodología que permite ajustar la frecuencia de palabras considerando palabras comunes dentro de los documentos. Este enfoque busca analizar el inverso de la frecuencia de los términos en los documentos (idf), lo cual decrementa la importancia a palabras que se usan comúnmente e incrementa la importancia a palabras que no son usadas mucho en una colección de documentos. Esto puede ser combinado con la frecuencia de los términos para calcular la frecuencia de un término ajustada por que tan comúnmente es usada (tf-idf).
+
+Definimos la frecuencia inversa del documento para cualquier término de la siguiente manera:
+
+* idf (term): $$In\left(\frac{n_{documents}}{n_{documents containing term}}\right)$$
+
+```{r}
+
+dataset_token_sector<- dataset_token %>% count(Sector, word) %>% group_by(Sector) 
+
+dataset_token_tfidf <- dataset_token_sector %>%
+  bind_tf_idf(word, Sector, n)
+
+dataset_token_ind<- dataset_token_tfidf %>% filter(Sector=='Industrials') 
+dataset_token_fin<- dataset_token_tfidf %>% filter(Sector=='Financial Services')
+dataset_token_tech<- dataset_token_tfidf %>% filter(Sector=='Technology') 
+
+wordcloud(words = dataset_token_ind$word, freq = dataset_token_ind$tf_idf, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"),scale=c(2,.01))
+
+wordcloud(words = dataset_token_fin$word, freq = dataset_token_fin$tf_idf, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"), scale=c(2,.01))
+
+wordcloud(words = dataset_token_tech$word, freq = dataset_token_tech$tf_idf, max.words = 100,random.order=FALSE, colors=brewer.pal(8, "Dark2"),scale=c(2,.01))
+
+```
+
