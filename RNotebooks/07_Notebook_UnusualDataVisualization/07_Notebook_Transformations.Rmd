@@ -1,0 +1,204 @@
+---
+title: "Exploración de Datos: Transformaciones"
+author: "Maria L Zamora y Ali Limon"
+date: "Agosto 30, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+```{r}
+
+
+##### Read the files 
+globalCompanies <- read.csv("outliers_data/globalCompanies_sandp.csv")
+
+##### Take a look to the size and columns
+nrow(globalCompanies)
+colnames(globalCompanies)
+
+##### Take a look to the first row
+head(globalCompanies,3)
+
+##### Summary
+sapply(globalCompanies,class)
+table(sapply(globalCompanies,class))
+
+##### Filter
+library(dplyr)
+mexComp <- filter(globalCompanies, Country=="Mexico")
+##### No rows with missings
+mexComp <- mexComp[complete.cases(mexComp), ]
+nrow(mexComp)
+
+
+### Capitaliazacion de mercado 
+mexComp$marketCap <- mexComp$currentPrice * mexComp$sharesOutstanding
+### Apalancamiento o Leverage : Borrowed money (debt) to generate returns on investments
+### Debt-to-EBITDA Ratio
+mexComp$leverageEbitda <- mexComp$totalDebt / mexComp$ebitda
+
+
+
+
+
+
+
+##################################### Diagnostics #####################################
+
+#### numeric values
+colnames(mexComp)
+colSelect <- c("Ticker","Website","Industry","Sector","State","fullTimeEmployee","ebitda","leverageEbitda", "marketCap")
+#arrange(mexComp[colSelect], fullTimeEmployee)
+
+par(mfrow=c(2,2))
+
+#### functions and plots
+plot( sort(mexComp$fullTimeEmployee) )
+
+newSum <- function(x){ return (x+1000000) }
+newSum <- sort( sapply(mexComp$fullTimeEmployee, newSum) )
+plot(newSum)
+
+newPower <- function(x){ return (x^3) }
+newPower <- sort( sapply(mexComp$fullTimeEmployee, newPower) )
+plot(newPower)
+
+newSin <- function(x){ return (sin(x)) }
+newSin <-  sort( sapply(mexComp$fullTimeEmployee, newSin) )
+plot(newSin)
+
+
+``` 
+
+
+```{r}
+
+par(mfrow=c(2,2))
+
+newTan <- function(x){ return (tan(x)) }
+newTan <-  sort( sapply(mexComp$fullTimeEmployee, newTan) )
+plot(newTan)
+
+newlog <- function(x){ return (log(x)) }
+newlog <- sort( sapply(mexComp$fullTimeEmployee, newlog) )
+plot(newlog)
+
+newlog10 <- function(x){ return (log10(x)) }
+newlog10 <-  sort( sapply(mexComp$fullTimeEmployee, newlog10) )
+plot(newlog10)
+
+newlog2 <- function(x){ return (log2(x)) }
+newlog2 <-  sort( sapply(mexComp$fullTimeEmployee, newlog2) )
+plot(newlog2)
+
+
+```
+
+
+
+```{r}
+par(mfrow=c(2,2))
+
+newInv <- function(x){ if (x>0){ return (1/x)}else {return(0)} }
+newInv  <-  sort( sapply(mexComp$fullTimeEmployee,newInv  ) )
+plot(newInv )
+
+newSqrt <- function(x){ return (sqrt(x)) }
+newSqrt <-  sort( sapply(mexComp$fullTimeEmployee, newSqrt ) )
+plot(newSqrt)
+
+newScale <- scale(mexComp$fullTimeEmployee, center = TRUE, scale = TRUE)
+plot(newScale)
+
+newScale <- scale(log(mexComp$fullTimeEmployee), center = TRUE, scale = TRUE)
+plot(newScale)
+
+```
+
+
+Ahora veamos los histogramas
+
+
+```{r}
+par(mfrow=c(2,2))
+
+#### functions and plots
+hist( sort(mexComp$fullTimeEmployee) )
+
+newSum <- function(x){ return (x+1000000) }
+newSum <- sort( sapply(mexComp$fullTimeEmployee, newSum) )
+hist(newSum)
+
+newPower <- function(x){ return (x^3) }
+newPower <- sort( sapply(mexComp$fullTimeEmployee, newPower) )
+hist(newPower)
+
+newSin <- function(x){ return (sin(x)) }
+newSin <-  sort( sapply(mexComp$fullTimeEmployee, newSin) )
+hist(newSin)
+
+
+``` 
+
+
+```{r}
+
+par(mfrow=c(2,2))
+
+newTan <- function(x){ return (tan(x)) }
+newTan <-  sort( sapply(mexComp$fullTimeEmployee, newTan) )
+hist(newTan)
+
+newlog <- function(x){ return (log(x)) }
+newlog <- sort( sapply(mexComp$fullTimeEmployee, newlog) )
+hist(newlog)
+
+newlog10 <- function(x){ return (log10(x)) }
+newlog10 <-  sort( sapply(mexComp$fullTimeEmployee, newlog10) )
+hist(newlog10)
+
+newlog2 <- function(x){ return (log2(x)) }
+newlog2 <-  sort( sapply(mexComp$fullTimeEmployee, newlog2) )
+hist(newlog2)
+
+
+```
+
+
+
+```{r}
+par(mfrow=c(2,2))
+
+newInv <- function(x){ if (x>0){ return (1/x)}else {return(0)} }
+newInv  <-  sort( sapply(mexComp$fullTimeEmployee,newInv  ) )
+hist(newInv )
+
+newSqrt <- function(x){ return (sqrt(x)) }
+newSqrt <-  sort( sapply(mexComp$fullTimeEmployee, newSqrt ) )
+hist(newSqrt)
+
+newScale <- scale(mexComp$fullTimeEmployee, center = TRUE, scale = TRUE)
+hist(newScale)
+
+newScale <- scale(log(mexComp$fullTimeEmployee), center = TRUE, scale = TRUE)
+hist(newScale)
+
+```
