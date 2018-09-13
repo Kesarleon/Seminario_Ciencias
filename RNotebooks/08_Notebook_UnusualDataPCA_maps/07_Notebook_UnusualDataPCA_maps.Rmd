@@ -66,29 +66,15 @@ _Source: correlations - Machine Learning, A Probabilistic Perspective _
 La primera parte del código corresponde a leer, describir y filtrar el dataframe. Estaremos usando los mismo datos de compañías en Mexico. 
 
 
-``` {r echo=FALSE,results = 'hide'}
+``` {r results = 'hide'}
 ##### Read the files 
 globalCompanies <- read.csv("outliers_data/globalCompanies_sandp.csv")
-
-##### Take a look to the size and columns
-nrow(globalCompanies)
-colnames(globalCompanies)
-
-##### Take a look to the first row
-head(globalCompanies,3)
-
-##### Summary
-sapply(globalCompanies,class)
-table(sapply(globalCompanies,class))
-summary(globalCompanies$Country)
 
 ##### Filter
 suppressMessages(library(dplyr))
 mexComp <- filter(globalCompanies, Country=="Mexico")
 ##### No rows with missings
 mexComp <- mexComp[complete.cases(mexComp), ]
-nrow(mexComp)
-
 
 ### Capitaliazacion de mercado 
 mexComp$marketCap <- mexComp$currentPrice * mexComp$sharesOutstanding
@@ -157,6 +143,8 @@ suppressMessages(library(stats))
 df.pca <- prcomp(df, center = TRUE, scale. = TRUE)
 plot(df.pca, type = "l")
 summary(df.pca)
+
+######## Using 2 last rows let's predict 2 "new"" companies
 predict(df.pca,newdata=tail(mexCompSelected, 2))
 
 ######## Plot
@@ -168,7 +156,7 @@ biplot(df.pca)
 
 <br /> 
 
-Ahora veamos el proceso con las matrices:
+Ahora veamos el proceso con el desarrollo de matrices:
 
 ``` {r results='asis'}
 library(knitr)
@@ -176,11 +164,12 @@ library(knitr)
 ######## Algorithm: Normalization
 df.norm <- scale(df, center = TRUE, scale = TRUE)
 
+####### Result after standarization
 knitr::kable(head(df.norm), format = "markdown")
 
+####### Summary of the std data
 knitr::kable(summary(df.norm), format = "markdown")
 
-pairs(df.norm)
 
 ### Correlation and covariance
 ### Source: Machine Learning, A Probabilistic Perspective (Kevin P. Murphy) (MIT Press) 2012
@@ -191,16 +180,19 @@ pairs(df.norm)
 ```
 
 ``` {r results='asis'}
+####### Covariance
 res.covar <- cov(df)
 knitr::kable(round(res.covar, 4), format = "markdown")
 ```
 
 ``` {r results='asis'}
+####### Std Deviation
 stdDev <- apply(df,2,sd)
 knitr::kable(round(stdDev, 4), format = "markdown")
 ```
 
 ``` {r results='asis'}
+####### Correlations
 res.correl <- cor(df)
 knitr::kable(round(res.correl, 4), format = "markdown")
 ```
@@ -212,10 +204,16 @@ res.selected <- res.correl
 ### Visualization
 ### Libraries: ggplot2 or d3heatmap or heatmaply 
 ### Correlation: When x is frequent, it would also be more likely that y happens
+
+### ggplot needs to "melt" the data first (all columns in one)
 suppressMessages(library(reshape2))
 melCorrel <- melt(res.correl)
+
+### Use the library to get a heatmap of Correlations
 suppressMessages(library(ggplot2))
 
+
+### Color scales: blue, red, white. Each time we put "+" we are adding more features to the graph
 ggplot(data = melCorrel, aes(Var2, Var1, fill = value))+
   geom_tile(color = "white")+
   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
@@ -227,29 +225,31 @@ ggplot(data = melCorrel, aes(Var2, Var1, fill = value))+
   coord_fixed()
 
 
-
-### Eigeinvectors and adjustment
+###### eigen FUNCTIONS
 res.eig <- eigen(res.selected)
+### This variable holds both things: eigenvectors and eigenvalues
 eigenvalues <- res.eig$values
 eigenvectors <- res.eig$vectors
+
+###### Rotate and adjust
 df.adjusted <- t(eigenvectors) %*% t(df.norm)
 
-### Components
+##### Components -> RENAME THE COLUMNS
 df.adjusted <- t(df.adjusted )
 colnames(df.adjusted) <- c("comp1", "comp2", "comp3", "comp4","comp5","comp6","comp7")
 kable(head(df.adjusted ), format = "markdown")
 
-### Covariance
+##### Covariance of adjusted data
 kable(round(cov(df.adjusted), 4), format = "markdown")
 ```
 
 ```{r}
-### Variance per component
+##### Variance per component
 stdDev <- apply(df.adjusted,2,sd)
 compVar <- stdDev^2
 round(compVar , 4)
 
-### Proportion of variance for total variance
+##### Proportion of variance for total variance
 propVar <- compVar/sum(compVar)
 propVar[0:3]
 
@@ -269,7 +269,7 @@ plot (cumsum(propVar), xlab="Components", ylab="Cumulative Proportion",type="b")
 
 - Existen muchas reglas para seleccionar la cantidad de componentes a usar una vez hecha la reducción, pero normalmente se busca llegar a tener un 75 a 90 % de variacion total, o al menos superar la varianza media. El resto de los componentes estarán conformados por el ruido.
 
-``` {r}
+``` {r} 
 mean(eigenvalues)
 ``` 
 ``` {r}
@@ -309,9 +309,9 @@ sqrt(eigenvalues[1]) * t(eigenvectors[,1]) %*% solve(sqrt(diag(diag(res.selected
 # 3. Visualización espacial de los datos
 <br />
 
-Una alternativa mas para evaluar los datos es a nivel gráfico, no solamente para saber acerca de su varianza o diferencias por categoría. Cuando se tienen datos de ubicación, resulta muy interesante saber construir mapas que puedan representar dichos datos a nivel Entidad, Pais, entre otros.. Queremos que conozcan todas estas herramientas con el fin de que logren entender el uso de las librerías y transformaciones necesarias para el análisis de datos.
+Otra alternativa para evaluar los datos a nivel gráfico, no solamente para saber acerca de su varianza o diferencias por categoría, es cuando se tienen datos de ubicación. Con ellos, resulta muy interesante saber construir mapas que puedan representar la información por Entidad, país, entre otros.. Queremos que conozcan todas estas herramientas con el fin de que logren entender el uso de las librerías y transformaciones necesarias para el análisis.
 
-Una aplicación de esto en el Mercado de Capitales es clara si pensamos en los diferentes instrumentos financieros que corresponden a empresas con mucha diversidad, no solo en productos y servicios, también en la tecnología que usan. En el siguiente mapa podemos ver las empresas de tecnología que existen en Mexico, con base en su entidad federativa, donde es claro que para la creación de modelos que utilicen esta variable será necesario tomar en cuenta la concentración en ciertas entidades.
+Una aplicación de esto en el Mercado de Capitales es clara si pensamos en los diferentes instrumentos financieros que corresponden a empresas con mucha diversidad, no solo en productos y servicios, también en la tecnología que usan. En el siguiente mapa podemos ver las empresas de tecnología que existen en México, con base en su entidad federativa, donde es claro que para la creación de modelos que utilicen esta variable será necesario tomar en cuenta la concentración en ciertas entidades.
 
 Para unir estos datos utilizamos como llave los nombres de los Estados que aparecen en la base total de empresas en Mexico de Inegi "RENIECYT-2017" y buscamos latitudes y longitudes. 
 
@@ -326,20 +326,31 @@ suppressMessages(library(data.table))
 suppressMessages(library(dplyr))
 #################### CANTIDAD DE EMPRESAS DE CIENCIA Y TECNOLOGIA POR ESTADO
 
+### Read the data 
 my_cyt <- fread("outliers_data/RENIECYT-2017-CLEAN.csv")
+
+#### Group all companies per entity and include latitude and longitude adding all companies (sum = number of companies per entity)
 my_cyt <- my_cyt %>% group_by(Entidad_raw, Longitud, Latitud) %>% summarise(sumEmpresa = sum(Empresa))
 
+### magnitude = sum = number of companies per entity
 magnitude <- my_cyt$sumEmpresa 
-cyt_normalized <- (magnitude-min(magnitude))/(max(magnitude)-min(magnitude))
-bins <- c(.1, .2, .3, .5, .6, .7,.8,.9, Inf)
 
+### Normalization using max and min values
+cyt_normalized <- (magnitude-min(magnitude))/(max(magnitude)-min(magnitude))
+
+### Get a range for colors (I want the PiGy color palette)
+bins <- c(.1, .2, .3, .5, .6, .7,.8,.9, Inf)
 pal <- colorBin("PiYG", domain = cyt_normalized, bins = bins)
+
+### Get the map with leaflet graph and include circles per entity, when selecting one Entity a "pop up" will appear and we want it to say "Entidad=... || numEpresas.....".
+### Also use the range and palette creating the scale with normalized data (cyt_normalized)
 mapresult <- leaflet(my_cyt) %>% addTiles() %>%
   addCircles(lng = ~Longitud, lat = ~Latitud, weight = 10, radius = ~50*sumEmpresa, 
              popup =  ~paste(paste("Entidad=",Entidad_raw),paste("   ||    numEmpresas",sumEmpresa)),
              color = ~pal(cyt_normalized)
   )
 
+### Print the map
 mapresult
 
 
