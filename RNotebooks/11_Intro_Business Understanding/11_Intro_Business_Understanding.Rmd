@@ -1,7 +1,7 @@
 ---
 title: "Introducción a Ciencia de Datos en el Mercado de Capitales"
 author: "Maria L Zamora y Ali Limon"
-date: "Septiembre 12, 2018"
+date: "Septiembre 13, 2018"
 output:
   html_document: default
   pdf_document: default
@@ -47,31 +47,31 @@ En las siguientes clases estaremos haciendo referencia al contexto teórico y pr
 
 Con el fin de que el proceso completo de minería de datos sea eficiente y no tengamos que regresar continuamente a redefinir el problema, limpiar datos y modelar, es importante hacer las preguntas correctas. Es decir, entre más sepamos de nuestro problema, menos nos va a costar el desarrollo de la solución y habrá una menor cantidad de iteraciones. Para ello, hay una serie de preguntas básicas que nos hacemos en Ciencia de Datos:
 
-¿Cómo puede mejorar tu negocio con el análisis de datos ?
+¿Cómo puede **mejorar** tu negocio con el análisis de datos ?
 
 - Tomar decisiones basadas en datos (data driven decisions)
 - Crecer el negocio descubriendo nuevas oportunidades
 - Crear una organización más eficiente e inteligente
 - Administrar Riesgos y Regulación
 
-¿De qué manera podemos estructurar nuestro problema?
+¿De qué manera podemos **estructurar** nuestro problema?
 
 - Predecir
 - Clasificar
 - Optimizar
 - Exposición
 
-¿Cuál es la periodicidad del problema?
+¿Cuál es la **periodicidad** del problema?
 
 - Evento “único”
 - Estrategia Diaria, mensual, trimestral, anual
 - Real time (Streaming), segundos o minutos (High frequency)
 
 
-¿Qué participantes / temas están involucrados en nuestro problema?
+¿Qué **participantes / temas** están involucrados en nuestro problema?
 
 - Ramas o aspectos financieros
-    - Mercado de Valores: Títulos de Deuda y Capital (este mercado también incluye Instrumentos Derivados)
+    - Mercado de Valores: Títulos de Deuda y Capital
     - Finanzas públicas o privadas 
 - Áreas dentro de la compañía 
     - Customer Services and Sales, Traders, Strategy and Research
@@ -79,14 +79,14 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
     - Compliance, Accounting and Support
     - Marketing, Project Management and Products
 
-¿Qué registros / productos estamos evaluando? 
+¿Qué **registros / productos** estamos evaluando? 
 
 - Instrumentos (Bonos o Acciones)
 - Inversionistas (clientes o compañías)
 - Operaciones (trades)
 
 
-¿Se cuenta con los datos? y ¿quién en el proveedor de esos datos?
+¿Se cuenta con los **datos**? y ¿quién en el **proveedor de esos datos**?
 
 - Muestra y diseño de la muestra 
 - Bases de datos internas
@@ -96,7 +96,7 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Alternative Data
 - Proveedores de señales y factores (Fintechs)
 
-¿Qué modelos se pueden utilizar para la solución? 
+¿Qué **modelos** se pueden utilizar para la solución? 
 
 - Target y valores del target
 - Modelo supervisado vs no supervisado
@@ -104,14 +104,14 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Teoria de Redes
 
 
-¿Cómo voy a evaluar el modelo?
+¿Cómo voy a **evaluar** el modelo?
 
 - Train and test
 - Métricas y pruebas de hipótesis 
 - Revisones periódicas (Backtesting)
 - Potenciales cambios en casos extremos (Stress test)  
 
-¿Cuál se espera que sea el resultado (aplicación)? 
+¿Cuál se espera que sea el **resultado (aplicación)**? 
 
 - Una página web o una app 
 - Script que pueda incorporarse a los algoritmos actuales
@@ -119,11 +119,10 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Un reporte nuevo
 - Un índice 
 
-¿Cuáles son los riesgos que debemos considerar durante el desarrollo de la solución?
+¿Cuáles son los **riesgos** que debemos considerar durante el desarrollo de la solución?
 
 - Costo para implementar la solución y riesgos operativos
 - Falta de información o actividad posterior para continuar con la funcionalidad de la solución 
 - Errores en el la muestra o el modelo
 - Pérdida potencial de la inversión 
-
 
