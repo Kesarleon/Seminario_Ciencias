@@ -59,7 +59,7 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Predecir
 - Clasificar
 - Optimizar
-- Exposición
+- Explicar (Exposición/Factorización)
 
 ¿Cuál es la **periodicidad** del problema?
 
