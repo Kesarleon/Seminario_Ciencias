@@ -1,0 +1,129 @@
+---
+title: "Introducción a Ciencia de Datos en el Mercado de Capitales"
+author: "Maria L Zamora y Ali Limon"
+date: "Septiembre 12, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<br />
+
+
+
+# 1. Introducción
+Un proyecto de ciencia de datos no sólo trata de recibir y almacenar datos, transformarlos,  o analizar las  variables para después aplicar modelos. Antes de este proceso, es vital entender el problema que se quiere resolver para realizar una formulación inicial del proceso a seguir. En este sentido,  fundamentos sólidos en el dominio relacionado al problema juega un papel preponderante para encontrar mejores y más creativas formulaciones. En nuestro caso, es vital entender cómo funcionan los activos financieros en general y el mercado de capitales en particular. 
+
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/fin_assets.jpg")
+```
+
+Cada activo tiene diferentes retos y características que un científico de datos debe entender para descomponer el problema en subprocesos que permitan obtener el mayor provecho de las herramientas estadísticas y computacionales.
+
+# 2. Business and Data Understanding
+
+Hemos estado utilizando información y aplicaciones generales del sistema financiero para entender cómo procesar información tradicional de empresas, hemos también hablado de cómo nos interesan algunas métricas para empresas (e.g. marketCap o leverage) o para clientes (e.g. churn rate) , y también hemos hecho hincapié en otro tipo de información no tradicional que puede incorporarse (e.g. google trends words, noticias, descripciones de las entidades). Sin embargo, nos podemos preguntar fácilmente: ¿por qué estamos evaluando compañías para saber de estrategias de inversión?, ¿por qué evaluaríamos clientes?, ¿cuál es el nivel de análisis al que debemos llegar?, ¿comó sabemos si una estrategia es buena? , ¿podemos evaluar el riesgo?, ¿con qué información se hace cada análisis?, y una vez que tengamos la solución, ¿quién hará uso de los resultados? o ¿para quién va dirigido el producto?
+
+Como ejemplo tomemos los dos ejercicios presentados en la clase anterior. Ambos ejercicios pueden plantearse como un problema de riesgo y rendimiento esperado al realizar una inversión. Por un lado tenemos el tema de las tarjetas de crédito y salida de clientes, donde las ganancias de la empresa se obtienen al prestar dinero a los clientes (líneas de crédito) y el riesgo se daría al no asignar de manera eficiente los recursos para retener e identificar clientes de buena calidad. Por otro lado en el tema de estrategias de inversión usando tendencias de google, las ganancias se obtienen al invertir el capital en el índice DJI y el riesgo es no identificar correctamente los movimientos del mercado. Si bien estos ejercicios buscan resolver el mismo problema: maximizar el rendimiento y minimizar el riesgo, ambos deben plantearse de manera diferente.
+
+En las siguientes clases estaremos haciendo referencia al contexto teórico y práctico de inversión de capitales. Esto es, de qué manera podemos estructurar un problema de inversión, cómo identificar las oportunidades que existen en el mercado y la manera de implementar dichas estrategias. Así mismo estudiaremos los conceptos en Ciencia de Datos útiles para resolver problemas en de este ámbito. Esta parte corresponde a la parte del ciclo de minería de datos llamada: Business and Data Understanding.
+
+
+### 2.1 Identificación de los componentes principales en nuestro problema.
+
+Con el fin de que el proceso completo de minería de datos sea eficiente y no tengamos que regresar continuamente a redefinir el problema, limpiar datos y modelar, es importante hacer las preguntas correctas. Es decir, entre más sepamos de nuestro problema, menos nos va a costar el desarrollo de la solución y habrá una menor cantidad de iteraciones. Para ello, hay una serie de preguntas básicas que nos hacemos en Ciencia de Datos:
+
+¿Cómo puede mejorar tu negocio con el análisis de datos ?
+
+- Tomar decisiones basadas en datos (data driven decisions)
+- Crecer el negocio descubriendo nuevas oportunidades
+- Crear una organización más eficiente e inteligente
+- Administrar Riesgos y Regulación
+
+¿De qué manera podemos estructurar nuestro problema?
+
+- Predecir
+- Clasificar
+- Optimizar
+- Exposición
+
+¿Cuál es la periodicidad del problema?
+
+- Evento “único”
+- Estrategia Diaria, mensual, trimestral, anual
+- Real time (Streaming), segundos o minutos (High frequency)
+
+
+¿Qué participantes / temas están involucrados en nuestro problema?
+
+- Ramas o aspectos financieros
+    - Mercado de Valores: Títulos de Deuda y Capital (este mercado también incluye Instrumentos Derivados)
+    - Finanzas públicas o privadas 
+- Áreas dentro de la compañía 
+    - Customer Services and Sales, Traders, Strategy and Research
+    - Risks, Operations and Technology
+    - Compliance, Accounting and Support
+    - Marketing, Project Management and Products
+
+¿Qué registros / productos estamos evaluando? 
+
+- Instrumentos (Bonos o Acciones)
+- Inversionistas (clientes o compañías)
+- Operaciones (trades)
+
+
+¿Se cuenta con los datos? y ¿quién en el proveedor de esos datos?
+
+- Muestra y diseño de la muestra 
+- Bases de datos internas
+- Proveedores de plataformas e información: Bloomberg, Reuters, ION trading, Valmer, Factset, etc. 
+- Internet (Web crawling)
+- Información Fundamental
+- Alternative Data
+- Proveedores de señales y factores (Fintechs)
+
+¿Qué modelos se pueden utilizar para la solución? 
+
+- Target y valores del target
+- Modelo supervisado vs no supervisado
+- Modelo paramétrico vs no paramétrico
+- Teoria de Redes
+
+
+¿Cómo voy a evaluar el modelo?
+
+- Train and test
+- Métricas y pruebas de hipótesis 
+- Revisones periódicas (Backtesting)
+- Potenciales cambios en casos extremos (Stress test)  
+
+¿Cuál se espera que sea el resultado (aplicación)? 
+
+- Una página web o una app 
+- Script que pueda incorporarse a los algoritmos actuales
+- Un conjunto de datos (selección de clientes)
+- Un reporte nuevo
+- Un índice 
+
+¿Cuáles son los riesgos que debemos considerar durante el desarrollo de la solución?
+
+- Costo para implementar la solución y riesgos operativos
+- Falta de información o actividad posterior para continuar con la funcionalidad de la solución 
+- Errores en el la muestra o el modelo
+- Pérdida potencial de la inversión 
+
+
