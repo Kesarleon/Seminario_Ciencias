@@ -1,0 +1,123 @@
+---
+title: "Análisis de Componentes Principales"
+author: "Luis Escobar"
+date: "15 September 2018"
+output:
+  html_document: default
+  pdf_document: default
+bibliography: referencias.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <font color="green">Brevísimo repaso</font>
+
+Para entender el procedimiento que se realiza con el método de componentes
+principales, vale la pena hacer un breve recuento de algunos conceptos y médidas
+estadísticas importantes: Normalización, Matriz de Covarianzas,
+Matriz de Correlaciones, Eigenvalores y Eigenvectores.
+
+## Normalización
+Recordemos que podemos normalizar (i.e., transformar una serie de datos
+para que tenga media cero y varianza 1) restando a cada punto de la serie
+la media de los datos y escalando con la varianza. El escalamiento se usa
+principalmente cuando puede haber problemas de escalas en nuestros datos.
+Por ejemplo, si estamos realizando un análisis en el que tenemos una variable
+que mida el salario de una muestra de personas, y otra que mida su estatura,
+nos encontraremos con que, dado que el salario generalmente se encuentra en miles
+de pesos, y la estatura se encuentra en metros, en cualquier análisis
+que realicemos, los resultados estarán sumamente sesgados por la magnitud de la
+variable "salario", por lo que, para hacer comparables las dos variables, es una
+buena práctica normalizar los datos. Para normalizar nuestros datos, hacemos:
+
+\begin{equation}
+\frac{X - \overline{X}}{Var(X)}
+\end{equation}
+
+## Matriz de Covarianzas.
+Mientras que la media y la varianza son medidas de tendencia central y de
+dispersión, respectivamente, para una serie de datos, existen medidas similares
+para la interacción entre dos o más series de datos. Una de esas medidas es
+la covarianza. La covarianza de dos series se calcula como:
+\begin{equation}
+s_{xy} = \frac{1}{n} \sum_{i = 1}^{n}(x_{i} - \overline{x})(y_{i} - \overline{y})
+\end{equation}
+
+La covarianza de una serie consigo mismo da como resultado su varianza. Cuando
+se tienen dos o más series, podemos acomodar las covarianzas en una matriz.
+
+## Matriz de Correlaciones
+Definimos la correlación entre dos variables como:
+\begin{equation}
+corr_{xy} = \frac{s_{xy}}{Var(x)Var(y)}
+\end{equation}
+Es decir, es el cociente de la covarianza entre el producto de sus varianzas.
+El coeficiente de correlación nos dice qué tan "sincronizados" son los movimientos
+entre las variables. Si la correlación es igual a 1 (valor máximo) quiere decir
+que el aumento (disminución) de una serie tiene un movimiento en la misma
+dirección y de la misma magnitud en la otra serie, análogamente, si la correlación
+es cero el movimiento es en dirección contraria. Cuando tenemos dos o más series
+también es posible crear una matriz de correlaciones.
+
+## Eigenvalores
+Sea $A$ una matriz de tamaño $n \times n$ y sea $I$ la matriz identidad del
+mismo tamaño. Los eigenvalores de $A$ son los valores
+$\lambda_{1}, \lambda_{2}, \dots, \lambda_{n}$ que satisfacen la ecuación
+polinomial $|A - \lambda I| = 0$ (donde $||$ es el determinante).
+
+Por otro lado, los eigenvectores son aquellos que satisfacen $A\textbf{x} = \lambda \textbf{x}$
+o lo que es lo mismo $(A - \lambda I)\textbf{x} = 0$. Si tenemos $n$ eigenvalores,
+entonces tenemos $n$ eigevectores asociados a cada eigenvalor.
+
+La importancia de los eigenvalores-eigenvectores reside en que, cualquier matriz
+$A$ puede ser reconstruida a partir de ellos de la siguiente forma:
+\begin{equation}
+A = \sum_{i = 1}^{n} \lambda_{i} e_{i} e_{i}^{'}
+\end{equation}
+donde $(\lambda_{i}, e_{i})$ son los pares de eigenvalores-eigenvectores de una
+matriz. A la ecuación anterior se le conoce como la **descomposición espectral**
+de una matriz.
+
+Para una descripción mucho más detallada de los eigenvalores y los eigenvectores
+véase [@AMSA88]
+
+Ejemplo (a mano, en el salón)
+
+
+# <font color="green">Análisis de Componentes Principales</font>
+El análisis de componentes principales es una de las herramientas más usadas
+para el análisis de datos, sea en minería de datos, machine learning, ciencia
+de datos, etc. Su importancia reside en que es una herramienta poderosa que nos
+permite extraer información de un conjunto de datos sumamente complejos. El
+objetivo principale del Análisis de Componentes Principales (Principal Components
+Analysis, o PCA) es el de reducción de dimensionalidad (dimensionality reduction).
+Por ejemplo, consideremos el subconjunto de datos "USArrests". Dichos datos
+contienen estadísticas de número de arrestos por cada 100,000 habitantes para
+cada estado en EE.UU. en tres categorías: asesinato (Murder), asalto (Assault) y
+violación (Rape), además, contiene el porcentaje de la población de cada estado
+que vive en un área urbana.
+
+```{r}
+suppressMessages(library(tidyverse))
+data("USAccDeaths")
+head(USArrests)
+```
+Es claro que cada uno de los puntos en nuestro conjunto de datos no es visible,
+pues se encuentran en un espacio de cuatro dimensiones. A lo más, podemos aspirar
+a ver la relación que guardan entre cada par de observaciones
+```{r}
+plot(USArrests)
+```
+
+Sin embargo, resultaría mucho más útil conocer 
+
+
+
+
+
+
+
+
+# <font color="green">Referencias</font>
