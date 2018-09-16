@@ -3,13 +3,18 @@ title: "Análisis de Componentes Principales"
 author: "Luis Escobar"
 date: "15 September 2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 bibliography: referencias.bib
 ---
 
+<style>
+body {text-align: justify}
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+source("/home/luis/Desktop/Pairs_AuxFunctions.R")
 ```
 
 # <font color="green">Brevísimo repaso</font>
@@ -87,6 +92,7 @@ Ejemplo (a mano, en el salón)
 
 
 # <font color="green">Análisis de Componentes Principales</font>
+
 El análisis de componentes principales es una de las herramientas más usadas
 para el análisis de datos, sea en minería de datos, machine learning, ciencia
 de datos, etc. Su importancia reside en que es una herramienta poderosa que nos
@@ -101,6 +107,7 @@ que vive en un área urbana.
 
 ```{r}
 suppressMessages(library(tidyverse))
+suppressMessages(library(gridExtra))
 data("USAccDeaths")
 head(USArrests)
 ```
@@ -108,16 +115,206 @@ Es claro que cada uno de los puntos en nuestro conjunto de datos no es visible,
 pues se encuentran en un espacio de cuatro dimensiones. A lo más, podemos aspirar
 a ver la relación que guardan entre cada par de observaciones
 ```{r}
-plot(USArrests)
+pairs(USArrests, upper.panel = panel.cor, diag.panel = panel.hist)
 ```
 
-Sin embargo, resultaría mucho más útil conocer 
+Resultaría muy útil poder explicar los datos con un subconjunto especial de los
+mismos que nos permitiera realizar el análisis clásico que aún es observable.
+Es aquí donde entra el Análisis de Componentes Principales (de aquí en
+adelante PCA).
+En el PCA se busca explicar la estructura de varianza-covarianza de un conjunto
+de datos a través de combinaciones lineales de las variables que forman dicho
+conjunto, con la finalidad de reducir la cantidad (y la dimensión) de los datos
+a análizar, así como facilitar la interpretación del conjunto de datos en su
+totalidad, tarea que resulta sumamente compleja cuando se tiene un gran número
+de variables, el cual puede ser tan grande como se quiera. Es importante mencionar
+que sólo a través de la totalidad de las variables es posible explicar en su
+totalidad la varianza de los datos, sin embargo, con PCA es posible explicar
+**la mayoría** de la varianza con unas cuántas variables. Generalmente, el PCA
+es un paso intermedio en un proceso de investigación, pues los resultados
+pueden ser utilizados en otros procedimientos, por ejemplo, análisis de regresión
+o de clustering.
 
 
+Obtenemos las siguientes definiciones de [@AMSA88]:
+En un conjunto de datos tenemos $X_{1}, X_{2}, \dots, X_{p}$ variables aleatorias.
+Las componentes principales son combinaciones lineales de dichas $p$ variables,
+y representan los ejes de un nuevo sistema de coordenadas sobre el que se proyectan
+los puntos originales del conjunto de datos. 
+
+Sea $\textbf{X}' = [X_1, X_2, \dots, X_p]$ con matriz de covarianzas $\Sigma$,
+cuyos eigenvalores son $\lambda_1, \lambda_2, \dots, \lambda_p$. Las componentes
+principales son las combinaciones lineales
+
+\begin{equation}
+	\begin{aligned}
+		Y_{1} = \textbf{a}^{'}_{1}\textbf{X} = a_{11}X_{1} + a_{12}X_{2} + \dots + a_{1p}X_{p} \\
+		Y_{2} = \textbf{a}^{'}_{2}\textbf{X} = a_{21}X_{1} + a_{22}X_{2} + \dots + a_{2p}X_{p} \\
+      						\vdots                                     \vdots \\
+		Y_{p} = \textbf{a}^{'}_{p}\textbf{X} = a_{p1}X_{1} + a_{p2}X_{2} + \dots + a_{pp}X_{p}
+	\end{aligned}
+\end{equation}
+
+tales que su varianza $Var(Y_i) = a_i^{'}\Sigma a_i$ es lo más grande posible
+y que estén no correlacionadas entre sí. La primer componente principal es aquella
+con varianza máxima, la segunda componente es aquella con la segunda varianza más
+grande y así sucesivamente.
+
+Un resultado importante dice que el calculo de las componentes principales
+depende únicamente de la matriz de covarianzas. Así, tenemos que si nuestro
+conjunto de datos tiene matriz de covarianzas $\Sigma$, con eigenvalores
+$\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_p \geq 0$ y eigenvectores
+$e_1, e_2, \dots, e_p$, entonces, calculamos la $i$-ésima componente como:
+
+\begin{equation}
+Y_{i} = e_{i}^{'}\textbf{X} = e_{i1}X_{1} + e_{i2}X_{2} + \dots + e_{ip}X_{p}
+\end{equation}
+
+así, $Var(Y_{i}) = e_{i}^{'} \Sigma e_{i} = \lambda_{i}$
+
+Una de las propiedades más importantes de las componentes es la cantidad de
+variabilidad del conjunto que logran capturar. Una propiedad que cumplen los
+eigenvalores de la matriz de covarianzas dice que, siendo 
+$(\lambda_{i}, e_{i}) \quad \forall \quad i \in \{1, 2, \dots, p\}$ los pares
+de eigenvalores-eigenvectores de $\Sigma$ y 
+$Y_{i} = e_{i}^{'}X \quad \forall \quad i \in \{1, 2, \dots, p\}$ las
+componentes, entonces:
+
+\begin{equation}
+\sigma_{11} + \sigma_{22} + \dots + \sigma_{pp} = \sum_{i = 1}^{p}Var(X_{i}) = \lambda_{1} + \lambda_{2} + \dots + \lambda_{p} = \sum_{i = 1}^{p}Var(Y_{i})
+\end{equation}
+
+lo anterior nos dice que la suma de los eigenvalores es la suma de la varianza
+total de las variables que forman nuestros datos, por lo que la variabilidad
+explicada por cada componente es el eigenvalor asociada a la misma. Es decir,
+la proporción de la varianza total explicada por la $k$-ésima componente es:
+
+\begin{equation}
+\frac{\lambda_{k}}{\lambda_1 + \lambda_2 + \dots + \lambda_p}
+\end{equation}
+
+Ejemplos (en clase)
+
+El siguiente ejemplo sale de https://uc-r.github.io/pca, y retomaremos el data
+frame "USArrests".
+
+Primero, para ver el impacto de la diferencia de escalas en las variables, vemos
+cómo difieren las varianzas:
+```{r}
+apply(USArrests, 2, var)
+```
+La columna de arrestos por asaltos tiene una variable claramente mucho mayor
+que el resto de las variables, por lo que los resultados estarían sumamente
+sesgados hacia esa variable. Como mencionamos, es necesario escalar los datos.
+```{r}
+head(USArrests)
+```
+```{r}
+USArrests_Scaled <- apply(USArrests, 2, scale)
+head(USArrests_Scaled)
+```
+
+## Calculando las componentes paso a paso.
+
+Primero, es necesario obtener la matriz de covarianzas
+```{r}
+USArrests_Cov <- cov(USArrests_Scaled)
+USArrests_Cov
+```
+Ahora, obtenemos los eigenvalores:
+```{r}
+USArrests_Eigen <- eigen(USArrests_Cov)
+print(USArrests_Eigen)
+```
+En lo anterior, vemos los eigenvalores y los eigenvectores. Con fines ilustrativos,
+solo usaremos dos componentes. Primero, vemos la proporción de varianza que se
+explica con las dos primeras componentes:
+```{r}
+USArrests_Eigen$values/sum(USArrests_Eigen$values)
+```
+Valores acumulados:
+```{r}
+cumsum(USArrests_Eigen$values/sum(USArrests_Eigen$values))
+```
+Con sólo dos componentes, explicamos el 86.7% de la varianza de los datos.
+Extraemos los eigenvectores; para ser consistentes con la notación, nombramos
+al vector de coeficientes a:
+```{r}
+a <- USArrests_Eigen$vectors[, 1:2]
+print(a)
+```
+Por default, los eigenvectores en R apuntan en sentido "negativo", por lo que
+los "volteamos" para dirigirlos al sentido "natural". Damos nombres a los
+renglones y las columnas.
+```{r}
+a <- -a
+rownames(a) <- c("Murder", "Assault", "UrbanPop", "Rape")
+colnames(a) <- c("PC1", "PC2")
+print(a)
+```
+Ahora, proyectamos los datos originales en el subespacio generado por las
+dos componentes:
+```{r}
+datos_en_subespacio <- as.matrix(USArrests_Scaled) %*% a %>% as.data.frame()
+datos_en_subespacio$Estado <- rownames(USArrests)
+datos_en_subespacio <- datos_en_subespacio %>% select(Estado, PC1, PC2)
+print(datos_en_subespacio)
+```
+
+Con los datos originales, podemos obtener una visualización de los estados
+en un espacio que sí podemos percibir:
+```{r}
+ggplot(as.data.frame(datos_en_subespacio), aes(PC1, PC2)) + 
+  modelr::geom_ref_line(h = 0) +
+  modelr::geom_ref_line(v = 0) +
+  geom_text(aes(label = Estado), size = 3) +
+  xlab("PC1") + 
+  ylab("PC2") + 
+  ggtitle("USArrests en dos dimensiones")
+```
+
+Como ya vieron, seleccionar el número óptimo de componentes es más bien arbitrario
+y depende del investigador. Sin embargo, una de las herramientas que se utilizan
+para seleccionarlas es la "ScreePlot". Donde veamos un cambio brusco en la
+pendiente de la gráfica es un buen punto para seleccionar el número, pues
+dicho cambio brusco se interpreta como un aporte marginal de cada componente
+a la varianza total.
+
+```{r}
+PVE <- USArrests_Eigen$values / sum(USArrests_Eigen$values)
+
+PVEplot <- qplot(c(1:4), PVE) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("PVE") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+# Cumulative PVE plot
+cumPVE <- qplot(c(1:4), cumsum(PVE)) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab(NULL) + 
+  ggtitle("Cumulative Scree Plot") +
+  ylim(0,1)
+
+grid.arrange(PVEplot, cumPVE, ncol = 2)
+```
+
+Dependiendo del criterio de cada quien, parecería que el número óptimo de
+componentes es 3.
 
 
-
-
+Obviamente, R tiene implementados varios métodos para calcular las componentes.
+```{r}
+resultado_pca <- prcomp(x = USArrests, scale. = T)
+str(resultado_pca)
+```
+Podemos obtener una gráfica que nos ayuda a ver la influencia de cada variable
+en cada componente.
+```{r}
+biplot(resultado_pca, scale = 0)
+```
 
 
 # <font color="green">Referencias</font>
