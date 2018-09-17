@@ -3,8 +3,8 @@ title: "Análisis de Componentes Principales"
 author: "Luis Escobar"
 date: "15 September 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 bibliography: referencias.bib
 ---
 
@@ -83,7 +83,9 @@ A = \sum_{i = 1}^{n} \lambda_{i} e_{i} e_{i}^{'}
 \end{equation}
 donde $(\lambda_{i}, e_{i})$ son los pares de eigenvalores-eigenvectores de una
 matriz. A la ecuación anterior se le conoce como la **descomposición espectral**
-de una matriz.
+de una matriz. *IMPORTANTE*, para que la descomposición espectral sea posible,
+es necesario que nuestra matriz sea simétrica y cuadrada, ésto para garantizar
+que todos los eigenvalores sean positivos.
 
 Para una descripción mucho más detallada de los eigenvalores y los eigenvectores
 véase [@AMSA88]
