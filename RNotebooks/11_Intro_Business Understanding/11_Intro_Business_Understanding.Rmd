@@ -126,3 +126,73 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Errores en el la muestra o el modelo
 - Pérdida potencial de la inversión 
 
+## 2.2 Aspectos Basicos del Mercado de Capitales
+¿Quienes son los principales participantes del Mercado de Capitales (México)?
+
+- Entidades Reguladoras
+    - Secretaria de Hacienda y Crédito Público
+    - Banco de México
+    - Comisión Nacional Bancaria y de Valores
+    
+- Entidades Operativas
+    - Emisoras
+    - Inversionistas
+    
+- Intermediarios
+    - Casas de Bolsa
+    - Especialista Bursátil
+    - Sociedades de Inversión 
+    - Fondos de Inversión 
+    - Especialista Bursátil
+    
+- Entidades de Apoyo
+    - Bolsa Mexicana de Valores
+    - Indeval
+    - Calificadora de Valores
+    - Valmer
+
+¿Que opciones de ahorro existen?
+
+- Mantener los pasivos de intermediarion tradiconales (Cuentas de Ahorro)
+- Mantener instrumentos directamente (direct investing)
+- Mantener instrumentos indirectamente (indirect invesment)
+
+¿Principales Tipos de activos financieros hay?
+
+- Inversión Directa 
+    - No negociables: Depositos de Ahorro, Certificados de Deposito 
+    - Mercado de Dinero: Cetes, Eurobonos, Reportos
+    - Mercado de Capitales: Deuda y Acciones
+    - Mercado de Derivados: Opciones, Swaps, Futuros, Forwards
+- Inversión Indirecta
+    - Sociedades de Inversión
+    - SIEFORES
+    - ETFs
+
+*Tipo de instrumentos e Indices*
+
+- Bonos (Bonds) = Debt
+  - Corporate -> Companies
+  - Banks
+  - Government (Risk Free)
+  - Asset Backed or Asset Linked
+  - Mortgage 
+  - Municipal
+  - Green Bonds 
+
+- Acciones 
+  - Large Cap 
+  - Medium Cap
+  - Small Cap
+  
+- Indices accionarios
+  - IPC (MEX)
+  - NQGI (USA)
+  - S&P500 (USA)
+  - EDDEXV (Frankfurt)
+
+
+
+  
+
+
