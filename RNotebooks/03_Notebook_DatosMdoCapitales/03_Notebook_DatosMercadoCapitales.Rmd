@@ -225,7 +225,7 @@ En este mismo contexto de simulaciones, existe el método **Montecarlo**[^2] que
 ## IV. Datos del mercado en la Web
 
 <br />
-Como parte de esta introducción al tema de Datos en el Mercado de Capitales, y con el fin de empezar a construir ejemplo con datos reales, es importante conocer el método de extracción de datos en la Web, conocido como **scrapping o web crawling**. Estos conceptos corresponden únicamente al hecho de extraer información, sin embargo, existen múltiples formas de hacerlo y distintas posibilidades para la estructura con que almacenamos los datos extraídos. Sin embargo, siempre partimos por entender la página Web en cuestión.
+Como parte de esta introducción al tema de Datos en el Mercado de Capitales, y con el fin de empezar a construir ejemplo con datos reales, es importante conocer el método de extracción de datos en la Web, conocido como **scraping o web crawling**. Estos conceptos corresponden únicamente al hecho de extraer información, sin embargo, existen múltiples formas de hacerlo y distintas posibilidades para la estructura con que almacenamos los datos extraídos. Sin embargo, siempre partimos por entender la página Web en cuestión.
 
 
 <br /> 
