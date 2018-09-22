@@ -1,0 +1,3 @@
+negocios|empresas en mexico
+mercados|bolsa mexicana de valores, bolsa de valores, mercado de valores, tipo de cambio  dolar
+nacional|noticias nacionales
