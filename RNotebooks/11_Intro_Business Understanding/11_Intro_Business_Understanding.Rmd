@@ -126,8 +126,59 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
 - Errores en el la muestra o el modelo
 - Pérdida potencial de la inversión 
 
-## 2.2 Aspectos Basicos del Mercado de Capitales
-¿Quienes son los principales participantes del Mercado de Capitales (México)?
+## 2.2 Aspectos Básicos en Inversión de Capitales 
+
+¿Qué opciones de ahorro existen?
+
+- Mantener los pasivos de intermediarion tradiconales (Cuentas de Ahorro)
+- Mantener instrumentos directamente (direct investing). 
+- Mantener instrumentos indirectamente (indirect invesment)
+
+¿Cuáles son los principales tipos de activos financieros?
+
+- Inversión Directa 
+    - No negociables: Depositos de Ahorro, Certificados de Depósito 
+    - Mercado de Dinero: Cetes, Eurobonos, Reportos
+    - Mercado de Capitales: Deuda y Acciones
+    - Mercado de Derivados: Opciones, Swaps, Futuros, Forwards
+- Inversión Indirecta
+    - Sociedades de Inversión
+    - SIEFORES
+    - ETFs
+
+¿Qué tipo de instrumentos existen en el mercado de capitales?
+
+- Bonos (Fixed Income)
+    - Corporativos 
+    - Bancarios
+    - Gubernamentales (Libre de Riesgo)
+    - Hipotecarios  
+    - Municipales
+    - Bonos Verdes 
+
+- Acciones (Equity)
+    - Capitalización Grande
+    - Capitalización Mediana
+    - Capitalización Chica
+
+¿Qué tipo de estrategias existen?
+
+- Alpha
+- Smart Beta
+
+¿Qué tipo de índices de mercado existen?
+
+- Geografía
+    - Globales: MSCI World, S&P Global 100
+    - Nacionales: IPC (Mex), S&P 500 (USA) and Nikkei 225 (Japan).
+- Sector
+    - Sectoriales (Compuestos por empresas de un sector determinado): Dow Industrials.
+- Tipo de Activo
+    - Renta Variable 
+    - Renta Fija
+    - Materias Primas
+
+¿Quiénes son los principales participantes del Mercado de Capitales (México)?
 
 - Entidades Reguladoras
     - Secretaria de Hacienda y Crédito Público
@@ -151,45 +202,7 @@ Con el fin de que el proceso completo de minería de datos sea eficiente y no te
     - Calificadora de Valores
     - Valmer
 
-¿Que opciones de ahorro existen?
 
-- Mantener los pasivos de intermediarion tradiconales (Cuentas de Ahorro)
-- Mantener instrumentos directamente (direct investing)
-- Mantener instrumentos indirectamente (indirect invesment)
-
-¿Principales Tipos de activos financieros hay?
-
-- Inversión Directa 
-    - No negociables: Depositos de Ahorro, Certificados de Deposito 
-    - Mercado de Dinero: Cetes, Eurobonos, Reportos
-    - Mercado de Capitales: Deuda y Acciones
-    - Mercado de Derivados: Opciones, Swaps, Futuros, Forwards
-- Inversión Indirecta
-    - Sociedades de Inversión
-    - SIEFORES
-    - ETFs
-
-*Tipo de instrumentos e Indices*
-
-- Bonos (Bonds) = Debt
-  - Corporate -> Companies
-  - Banks
-  - Government (Risk Free)
-  - Asset Backed or Asset Linked
-  - Mortgage 
-  - Municipal
-  - Green Bonds 
-
-- Acciones 
-  - Large Cap 
-  - Medium Cap
-  - Small Cap
-  
-- Indices accionarios
-  - IPC (MEX)
-  - NQGI (USA)
-  - S&P500 (USA)
-  - EDDEXV (Frankfurt)
 
 
 
