@@ -1,0 +1,174 @@
+---
+title: "Métodos Supervisados contra No Supervisados"
+author: "Maria L sección y Ali Limon"
+date: "September 20th, 2018"
+output: html_document
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<br />
+
+#1 Introducción
+
+Considera **dos preguntas** similares que podrías hacerte acerca de los rendimientos de acciones de diferentes empresas. La primera es: "¿Los **rendimientos** por empresa **pueden** caer dentro de **diferentes grupos**?", en este caso ningun proposito/objetivo en particular ha sido considerado para los **grupos**. Cuando no existe tal objetivo, el problema de minería de datos se define como **_no-supervisado_**. En contraste con esto, otra pregunta que podría existir es: “¿Podemos identificar **acciones** que tengan particularmente una alta **probabilidad de tener un rendimiento positivo** al siguiente dia? En este sentido si existe un objetivo definido (conocido en Estadistica como variable dependiente, o en Ciencia de Datos como **target** o **response variable**): Saber si la acción tendrá un rendimiento de tipo **positivo** al siguiente dia. En este caso, la segmentación es hecha para tomar acciones basadas en la probabilidad de que suba el precio de la acción. Esto es llamado un problema **supervisado** de minería de datos.
+
+La diferencia entre estas preguntas es sutil pero importante. Por un lado, una técnica supervisada tiene **definido el objetivo para la clasificación/predicción/optimización** y la información necesaria para lograrlo. En realidad, el término de "supervisado" corresponde al área de Machine Learning, ya que es precisamente a través de ese Target que la máquina "aprende". Mientras que por otro lado, una tarea no supervisada, solo trata de reunir información para generar conclusiones acerca de cómo encontrar **grupos de individuos (a.k.a. clustering), elementos similares (a.k.a. similarity) y asociación de eventos (a.k.a. co-occurrence)**. Es muy importante tener claro que en este tipo de tareas, no hay una garantía sobre la utilidad que tendrá el modelo a desarrollar.
+
+
+<br />
+
+Vamos a ver algunos ejemplos de gráficas donde se puede identificar claramente cuando existe o no un target en los datos.
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/supvsunsup.jpg")
+```
+
+```{r}
+colnames(iris)
+knitr::kable(head(iris))
+plot(iris$Petal.Length, iris$Petal.Width)
+```
+
+```{r}
+unique(data.frame(iris$Species))
+#http://www.endmemo.com/program/R/pchsymbols.php
+
+plot(iris$Petal.Length, iris$Petal.Width, pch=23, bg=c("red","green3","blue")[unclass(iris$Species)])
+```
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+
+globalCompanies <- read.csv("data/globalCompanies_sandp.csv",header = TRUE) %>%  filter(Country=="Mexico")
+
+ggplot(data = globalCompanies) +
+  geom_jitter(mapping = aes(x = log10(globalCompanies$totalDebt), y = log10(globalCompanies$totalRevenue)))
+```
+
+```{r}
+unique(data.frame(globalCompanies$State))
+
+ggplot(data = globalCompanies) +
+  geom_jitter(mapping = aes(x = log10(globalCompanies$totalDebt), y = log10(globalCompanies$totalRevenue), color=globalCompanies$State))
+```
+
+
+```{r}
+globalCompanies$StateDFBinary <- unlist(lapply(globalCompanies$State, function(x) { if (x=='DF') return("DF") else return ("OTHER")} ))
+
+ggplot(data = globalCompanies) +
+  geom_jitter(mapping = aes(x = log10(globalCompanies$totalDebt), y = log10(globalCompanies$totalRevenue), color=globalCompanies$StateDFBinary))
+```
+
+
+
+<br />
+
+#2. Métodos Supervisados
+
+<br />
+
+Frecuentemente, los métodos supervisados obtienen mejores resultados para los problemas que queremos resolver. Sin embargo, estos también requieren de mayores recursos para poder ser utilizados[^1]. 
+
+Entre otras cosas, tener la variable de target nos ayuda no solo a llegar más fácil a una solución del problema, también delimita la lista de modelos que podemos usar y nos ayuda a realizar una mejor selección de variables (conocidas en Estadistica como variables independientes, y en Ciencia de Datos como **features, attributes o covariates**). Existen herramientas que podemos usar como **Information Gain**, o incluso la **correlación** de cada variable $X_i$ con nuestro target $Y$, para analizar que tanta contribución tenemos para el objetivo deseado.
+
+Técnicamente, existe una condición que debe ser cumplida para usar los métodos supervisados: debe haber información de la variable objetivo. Lo anterior debe analizarse de la siguiente forma: No es suficiente con saber que el problema tienen un objetivo, debemos asegurarnos tambien de que exista esa variable en nuestro dataset. Por ejemplo, podríamos tener el **objetivo** de saber si el **rendimiento de un bono o acción va a subir mañana** (target **diario**: positivo o negativo). En este caso pensaríamos en esto como una tarea de tipo supervisado pero si la información histórica que se tiene solo incluye frecuencias _anuales_, entonces no existen como tal los datos.
+
+Cuando se presenta un caso como este, donde **no** tenemos explícitamente los datos para el Target, el proceso para adquirirlos se vuelve una decision de inversion importante en Ciencia de Datos. Al tratar de conseguir estos datos estaríamos pensando en una estrategia para **etiquetar** a los individuos (_individual’s label_), y para ello es importante tomar en cuenta costos, tiempos e integridad de la información ("domain knowledge"). 
+
+```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/label.jpg")
+```
+
+<br />
+
+## 2.1 Metodos principales: Predicción y Clasificación 
+
+Existen dos principales clases de minería de datos de tipo **supervisado**;  clasificacion y regresion, que son distinguidas por el tipo de la variable objetivo. Regresión envuelve un objetivo numérico mientras que clasificación un objetivo categórico (binario o multiclase). 
+
+<br /> 
+
+Considera estas preguntas que podrían abordar con métodos supervisados:
+
+¿El valor de mi inversión subirá mañana?
+
+Este es un problema de clasificación debido a que tiene un objetivo binario: subir o bajar. Normalmente, para modelar, no se considera el evento en la que la acción se mantiene con el mismo precio.
+
+¿Cuánto subirá mi inversión?
+
+
+
+Este es un problema de regresión puesto que tiene un objetivo numérico. La variables objetivo es el monto que subirá (bajará) el precio de la acción.
+
+
+<br />
+
+
+Hay sutilezas entre estas preguntas que deben ser analizadas. Una muy importante, para aplicaciones de negocios, es cuando se realizan **predicciones numéricas sobre aspectos categóricos**. Por ejemplo, recordemos el ejercicio de la tasa de abandono (churn rate example), una predicción sencilla sería saber si el cliente abandona o no (binario) la linea de credito, pero tambien nos gustaria poder modelar la probabilidad (valor entre 0 y 1) de que ese evento suceda. Esto, sigue siendo considerado como un problema de **clasificación** (más que uno de regresión) debido a que la variable objetivo es categórica. Lo que estaríamos buscando al conseguir la probabilidad es realmente una **“estimación de probabilidad de la clase/categoría”**.
+
+
+<br />
+
+En resumen, una parte vital en las primeras etapas de un proceso de minería de datos es (1) decidir si la línea de ataque será supervisada o no supervisada y (2) si es supervisada, el producir una definición precisa de la variable objetivo. Esta variable debe ser una cantidad específica que será el foco para la extracción de datos.
+
+<br />
+
+A partir de eso, todo se resume a crear modelos y evaluarlos, tomando en cuenta que (como ya mencionamos en clases anteriores) se debe definir la temporalidad. Es decir, puede consistir en un modelo/solucion "único" (**mining the data to find patterns**) o en una implementacion para evaluar nuevos datos de manera diaria, mensual, o anual, entre otros  (**using results of data mining**) [^2].
+
+```{r, out.width = "700px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/modelClassProcess.jpg")
+```
+
+## 2.2 Otros Metodos Supervisados
+
+<br />
+
+Otro tipo de método supervisado que te podrás encontrar esta relacionado al modelado de tipo **causal**. Estos modelos buscan ayudarnos a entender los factores, eventos o acciones que tienen influencia en el Target. De hecho, en la clase anterior abordamos esto como problemas cuyo fin es _"explicar"_. Por ejemplo, considerando que se usa un modelo predictivo para seleccionar a algunos clientes y dirigirles descuentos/ofertas en sus inversiones, lo mas logico seria hacer un análisis posterior, donde podríamos encontrar (en el mejor de los casos) que las tasas de nuestro producto para esos clientes "target" realmente mejoraron.
+
+De esta forma pensariamos ¿fue realmente la oferta/descuento? o ¿nuestro modelo predictivo sólo seleccionó a los clientes que de todas formas iban a mejorar la inversión?
+
+Las respuestas a estas preguntas corresponden a técnicas de **Causal modeling**  donde sí existe un objetivo pero cuyos datos dependen de experimentos "controlados", como el que acabamos de plantear. El fundamento principal es entender que pasaría con nuestro objetivo **con o sin la presencia de algún factor/evento** (counterfactual analysis). Son análisis acerca de un target, donde existe una lista de factores experimentales que suceden en torno a los individuos (estos factores son, por ende, lo que se conoce, ya que se vuelve imposible analizar el "hubiera" de otros factores y eventos sobre la misma persona, al mismo tiempo).
+
+<br />
+
+## 2.3 Modelos Supervisados en Machine Learning
+
+<br />
+
+En esta sección presentamos un resumen de los principales métodos supervisados para clasificacion y regresion.
+
+
+-  Regresión Lineal (Regresión): Es usado para estimar valores reales (costo de casas, número de llamadas, ventas totales, etc. ) basado en variables continuas. Aquí nosotros establecemos relaciones de las features y con la variable target, ajustando la "mejor linea". La línea que mejor ajusta es conocida como línea de regresión y es representada por una ecuación lineal Y = a * X + B.
+
+-  Regresión Logística (Clasificación & Regresión): Es usada para estimar valores discretos (valores Binarios como 0/1, si/no, verdadero/falso) basado en un conjunto de features. En palabras simples, este modelo predice la probabilidad de ocurrencia de un evento ajustando los datos a una función logística. Esta regresión predice la probabilidad, y sus valores de salida caen dentro de 0 y 1.
+
+- Árboles de Decisión (Clasificación & Regresión): Particiona el espacio de los datos dividiéndolo en (hyper) rectángulos y creando una "segmentación supervisada" -- esto es, una segmentación del espacio impulsada por las diferencias en el valor de la variable objetivo. Cada segmento incluye una estimación de la probabilidad de pertenecer a la clase para los puntos de datos que caen en el segmento. 
+
+- Suport Vector Machines (Clasificación): En este algoritmo, cada elemento de datos es proyectado como un punto en un espacio n-dimensional (donde n es el numero de features que tu tienes), con el valor de cada feature siento el valor de cada coordenada. Entonces, se realiza la clasificacion encontrando el hyper-plano que divide las dos clases. 
+
+- Naive Bayes (Clasificación): Es una tecnica de clasificacion basada en el teorema de Bayes, con el supuesto de independencia entre los predictores. En terminos sencillos, un clasificador Naive Bayes supone que la presencia de una feature en particular en una clase no esta relacionada a la precencia de cualquier otra. 
+
+- Arboles Aleatorios / Random Forests (Clasificación & Regresión): los Arboles aleatorios son construidos a partir de un ensamblado de arboles de desicion. En arboles aleatorios, se utiliza una coleccion de arboles de desicion, conocido como Forest. Para clasificar un nuevo objeto basado en atributos, cada arbol brinda una clasificacion que representan votos para la clase. El bosque escoge la clasificacion que tiene el mayor numero de votos. 
+
+- Gradient Boosting algorithms (Clasificación): Gradient boosting es una técnica que produce un modelo de predicción en la forma de un ensamblado de modelos predictivos débiles, típicamente árboles de decisión. 
+
+
+
+
+
+# Referencias
+
+[^1]: Source: Introduction to Data Science for Business Analytics, Foster Provost and Brian Dalessandro, 2015-2017. MS Data Science, New York University.
+[^2]: 'Data Mining and Its Results'. Chapter 2: Business Problems and Data Science Solutions. Data Science for Business, Foster Provost and Tom Fawcett
