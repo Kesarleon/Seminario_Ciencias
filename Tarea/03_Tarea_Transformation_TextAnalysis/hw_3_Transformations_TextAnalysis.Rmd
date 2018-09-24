@@ -1,0 +1,113 @@
+---
+title: "Tarea 3: Transformations and Text Analysis"
+author: "Maria L Zamora y Ali Limon"
+due date: "6 Oct, 2018. 11:59 p.m."
+output: html_document
+---
+
+<style>
+p.caption {
+  font-size: 0.78em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<br />
+
+## Motivacion
+
+Como hemos estado comentando durante el curso, el tema del análisis de los mercados es vital cuando hacemos inversiones o análisis de los Mercados de Capitales. Existen 2 tipos de análisis principales para esto: análisis técnico y análisis fundamental. 
+
+Por un lado, el **análisis técnico** corresponde a la toma de decisiones con base en estadísticas de predicción de Rendimientos, Volumen, Riesgos y Volatilidad, entre otras cosas. El fin principal es encontrar patrones en las tendencias y sus puntos de cambio (e.g. resistencias y soportes), en otras palabras, la situación de oferta y demanda, ya que esto permite encontrar oportunidades de Compra/Venta en el mercado. Se realiza con base en datos históricos de los instrumentos y sus transacciones, y es indispensable para crear algoritmos y estrategias básicas de Trading automático. Como podrán imaginarse ya, Ciencia de Datos es un campo que tiene mucha aplicación en este análisis, no sólo por los algoritmos de predicción e identificación de patrones, también por las habilidades para crear herramientas de visualización. 
+
+Por otro lado, existe el **análisis fundamental**, que consiste en analizar otros datos tradicionales y no tradicionales, tanto cuantitativos como cualitativos. La escala de este análisis corresponde normalmente a empresas, instrumentos o índices (aunque también podemos hacer análisis de transacciones, fondos, mercados, etc). Cuando se hace referencia al análisis fundamental, es común que se piense en variables de evaluación de micro y macroeconomía, sin embargo, es aquí donde podemos ampliar el concepto y pensar en **"alternative data"**, ya que es importante evaluar los factores y la influencia que tienen agentes externos, por ejemplo en las compañías. Para pensar en otras variables no tradicionales que podemos usar existen incluso ramas financieras especializadas, como "Behavioral finance" o "Behavioral Economics" cuyo fundamento esta basado en que los inversionista (y por ende los mercados) no tienen un comportamiento racional. 
+
+<br />
+Para ambos casos, es de vital importancia definir la periodicidad de nuestro problema a resolver ya que las variables a evaluar pueden tener diferentes estructuras de tiempo. Es decir, dado que las métricas se reportan de manera mensual, semanal, por trimestre, etc..  algunas veces es necesario **agregar** los datos (calculando, por ejemplo, promedios) para llegar a la temporalidad deseada.
+
+
+<br /> 
+
+## Sentiment Analysis
+
+<br />
+Un tema que se comparte en ambos tipos de análisis es el interés por conocer las **tendencias** del mercado. Ya les hemos hablado al respecto de *Google Trends*, por ejemplo, y en esta ocasión los queremos introducir al tema de **"Sentiment Analysis"**. Este termino tiene fundamentos en el area de NLP (Natural Language Processing) y su idea básica es tratar de entender el comportamiento de un producto/mercado/servicio (pensemos en las compañías que nos "ofrecen" sus bonos o acciones). Entre otras cosas, saber si va a la alza o a la baja. Dicho lo anterior, la pregunta inmediata podría ser: como se calcula el "sentimiento" de eso? que influencias externas tiene? que resultado esperamos buscar cuando hablamos de un sentimiento? es un sentimiento positivo o negativo? que temas se están abordando en común recientemente? 
+
+<br />
+
+Una manera de evaluar el sentimiento es con datos de tipo **estructurado**, como en los cuestionarios que piden rangos de calificaciones o quizás con la cantidad de "likes". Sin embargo, una parte también muy interesante corresponde al análisis de texto (como en Google trends) y es precisamente lo que haremos en esta tarea, usar datos **no estructurados**. Hablando de Ciencia de Datos y Sentiment Analysis, hay muchas aplicaciones de Big Data (ya habíamos comentado acerca de los casos de grandes dimensiones de datos), Machine Learning y Deep Learning. En particular, casos ya mas avanzados, utilizan redes neuronales para "aprender" o "recordar" las tendencias. 
+
+<br />
+
+Para que quede mas claro, podrían imaginar la importancia de conocer el sentimiento, por ejemplo, de películas (Netflix), música (Spotify) y fotografías (pinterest). En el Mercado de Capitales, podríamos pensar en el análisis de sentimiento a nivel de **intrumentos, indices, companias, sectores o bolsas (exchange)**. En esta ocasión la tarea consiste en encontrar sentimientos de acciones (tickers) y para ello vamos a seleccionar las *20 acciones de mayor peso en el S&P*.
+
+<br /> 
+
+Con lo que hemos platicado en clase y ayudantía es suficiente para que hagan la tarea. Revisen con detenimiento las clases de analisis de texto y web scrapping. Así mismo les dejamos algunas referencias adicionales para que puedan conocer mas al respecto de la teoría y aplicaciones.
+
+- [Sentiment analysis 1](https://pdfs.semanticscholar.org/42b1/0e23482cd2a0dcbd4c9ac1295620d4c80be5.pdf)
+- [Sentiment analysis 2](https://nlp.stanford.edu/pubs/lrec2014-stock.pdf)
+
+<br /> 
+
+## Homework: Sentiment analysis and News
+
+<br /> 
+
+- Select top 20 stocks Companies Weighted from largest to smallest  (S&P500)
+
+    + https://www.slickcharts.com/sp500 
+
+<br /> 
+
+- Web crawling: Get news and descriptions per stock (ticker)  -> SAVE ALL DATA IN TXT FILES
+
+    + https://cran.r-project.org/web/packages/rvest/index.html 
+
+<br />
+
+- Create a dataframe: You might create a dataframe with columns: news_id, ticker, text.
+
+<br />
+
+- Build the corpus: Create a corpus using news as documents and use the one-token-per-document-per-row structure to represent your data in R.  
+
+
+<br />
+
+- Preprocessing: remove stopwords and punctuation, turn to lowercase. Finally get frequency of words (tf) and the term frequency–inverse document frequency (tf-idf). 
+
+    + https://gist.github.com/bindiego/db4b820fcd2c5eef5fa5
+    
+<br /> 
+
+- Get the top 10 words (based on tfidf)   
+
+<br /> 
+
+- Get the sentiment of each word
+
+    + https://cran.r-project.org/web/packages/syuzhet/syuzhet.pdf
+    + https://www.tidytextmining.com/sentiment.html
+    
+<br /> 
+
+- Analyze sentiment, trends and topics per STOCK: BE CREATIVE, use at least 3 different graphs and explain
+
+<br /> 
+
+- Take 5 stocks to compare results with experts (websites) and explain [stockfluence](https://www.stockfluence.com/), [sentdex](http://sentdex.com/financial-analysis/), and [goldenrocks](http://goldenrocks.me/).
+
+
+
+<br /> 
+
+**Formato de entrega**: Mandar a los profesores y ayudante un **zip** con el nombre de "Tarea3_NumerodeCuenta" e incluir: **Rmd, HTML y los datos (texto en FORMATO TXT)**. Recuerden empezar a tiempo y utilizar piazza para colaborar entre todos con las dudas! Mucho éxito! 
+
+
+
