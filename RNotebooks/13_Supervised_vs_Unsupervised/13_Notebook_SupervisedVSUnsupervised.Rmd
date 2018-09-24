@@ -1,7 +1,7 @@
 ---
 title: "Métodos Supervisados contra No Supervisados"
 author: "Maria L Zamora y Ali Limon"
-date: "September 20th, 2018"
+date: "September 24th, 2018"
 output: html_document
 ---
 
