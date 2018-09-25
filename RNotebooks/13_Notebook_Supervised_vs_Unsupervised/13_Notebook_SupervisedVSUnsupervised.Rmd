@@ -30,9 +30,11 @@ La diferencia entre estas preguntas es sutil pero importante. Por un lado, una t
 
 Vamos a ver algunos ejemplos de gráficas donde se puede identificar claramente cuando existe o no un target en los datos.
 
-```{r, out.width = "500px", echo=FALSE, fig.align = "center"}
-knitr::include_graphics("img/supvsunsup.jpg")
+```{r, out.width = "700px", echo=FALSE, fig.align = "center"}
+knitr::include_graphics("img/sup.jpg")
 ```
+
+
 
 ```{r}
 colnames(iris)
