@@ -1,0 +1,377 @@
+---
+title: "De R a Python Parte 1"
+author: "Luis Escobar"
+date: "26/09/2018"
+output:
+  html_document: default
+  pdf_document: default
+bibliography: referencias.bib
+---
+
+<style>
+body {text-align: justify}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <font color="green">Manipulación y transformación de datos en R y Python</font>
+Hasta ahora, hemos visto una gran cantidad de ejemplos de manipulación y
+transformación de datos con R, siendo el "tidyverse" nuestro mejor aliado
+para dicha tarea (@Wickham:2017:RDS:3086927 debe de volverse un libro de
+cabecera para el curso).
+
+Para Python tenemos un recurso similar (@Wes:2012:PDA:2458650), en el que
+también se explica de manera clara y con muchos ejemplos el funcionamiento de
+las principales herramientas utilizadas por los científicos de datos en
+Python. Es importante recordar que hay muchos recursos para referencia inmediata,
+que regularmente se nos presentan en forma de "acordeón" (cheatsheets). Para
+la manipulación de datos en Python (y guardando mucho similitud con lo que se
+hace en R), tenemos el "acordeón" de "Data Wrangling with pandas" (http://pandas.pydata.org/Pandas_Cheat_Sheet.pdf).
+
+Repasaremos las tareas principales que hemos aprendido hacer con R, y las
+complementaremos con un ejemplo en Python valiéndonos de la capacidad de
+RMarkdown de utilizar los dos lenguajes simultáneamente.
+
+Trabajaremos con el ya conocido dataset "*iris*".
+
+# <font color="green">Setup inicial</font>
+
+Primero, cargamos las librerias necesarias de R y Python
+
+```{r, echo=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(reticulate))
+use_python("/usr/bin/python2.7")
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+# <font color="green">Básicos en Python</font>
+
+## <font color="blue">For</font>
+```{python}
+for i in range(10):
+  print i
+```
+
+## <font color="blue">If</font>
+Queremos imprimir sólo los números pares.
+```{python}
+for i in range(10):
+  if i % 2 == 0:
+    print i
+  else:
+    next
+```
+## <font color="blue">While</font>
+```{python}
+entero = 10
+control = 1
+while control <= entero:
+  if control == entero:
+    print "Llegamos al valor deseado"
+    break
+  else:
+    print "El control es: " + str(control) + "\n"
+    control += 1
+
+```
+
+## <font color="blue">¿Cómo definimos una función en python?</font>
+En Python, utilizamos la palabra reservada "def" para definir una función.
+```{python}
+def operacion(x, y, op):
+  """Returns the desired operation (suma, resta, c(producto, multiplicacion),
+     division) using x and y as inputs
+  """
+  if isinstance(x, (int, long, float, complex)) and isinstance(y, (int, long, float, complex)):
+    if y == 0 and op == "division":
+      print "No es posible dividir entre cero"
+      return None
+    else:
+      if op=="suma":
+        return x+y
+      elif op=="resta":
+        return x-y
+      elif op=="producto" or op=="multiplicacion":
+        return x*y
+      elif op=="division":
+        return x/float(y) # DO NOT DO THIS IN YOUR CODE
+      else:
+        print "La operacion solicitada no está definida"
+  else:
+    print "x y y deben de ser números"
+
+
+## Llamamos la funcion
+print operacion(3, 4, "suma")
+print operacion(3, 4, "resta")
+print operacion(3, 4, "multiplicacion")
+print operacion(3, 4, "producto")
+print operacion(3, 4, "division")
+print operacion(3, 4, "modulo")
+print operacion("3", 4, "suma")
+```
+
+
+# <font color="green">Carga inicial de datos</font>
+En R podemos acceder a un conjunto de datos con la función data(nombre_dataset).
+En Python no es tan directo, pues necesitamos importar bibliotecas extra para
+poder acceder a datasets precargados. Para fines ilustrativos, usaremos el
+paquete "seaborn", que además de proveernos de datasets en python, nos da una
+forma de gráficar algo similar a ggplot2.
+
+```{r}
+iris_r <- iris %>% tbl_df()
+head(iris_r, n=3)
+```
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+```{python}
+iris_p = sns.load_dataset("iris") # Carga los datos como DataFrame
+print iris_p.head()
+```
+
+# <font color="green">Verbos de dplyr en Python</font>
+## <font color="blue">filter</font>
+En R:
+```{r}
+iris_r %>% filter(Species == "setosa") %>% head(n = 5)
+```
+
+En Python:
+```{python}
+print iris_p[iris_p.species == "setosa"].head()
+```
+
+## <font color="blue">select</font>
+En R:
+```{r}
+iris_r %>% select(Species, Sepal.Length) %>% head(n = 5)
+```
+
+En Python:
+```{python}
+print iris_p[["species", "sepal_length"]].head()
+```
+
+## <font color="blue">mutate</font>
+En R:
+```{r}
+iris_r %>% mutate(Sepal.Area = Sepal.Length*Sepal.Width) %>% head(n = 5)
+```
+
+En Python tenemos varias formas:
+```{python}
+iris_p['sepal_area'] = iris_p.sepal_length * iris_p.sepal_width
+print iris_p.head()
+iris_p = iris_p[["sepal_length", "sepal_width", "petal_length", "petal_width", "species"]]
+```
+
+```{python}
+print iris_p.assign(sepal_area = lambda df: df.sepal_length * df.sepal_width).head()
+```
+
+```{python}
+print iris_p.head()
+```
+
+
+## <font color="blue">arrange</font>
+En R:
+```{r}
+iris_r %>% arrange(desc(Sepal.Length), Petal.Length) %>% head(n = 5)
+```
+
+En Python:
+```{python}
+print iris_p.sort_values(["sepal_length", "petal_length"], ascending=[False, True]).head()
+```
+
+
+## <font color="blue">group_by + summarize</font>
+En R:
+```{r}
+iris_r %>% group_by(Species) %>% summarize(MeanSepLen = mean(Sepal.Length),
+                                           MeanSepWid = mean(Sepal.Width),
+                                           MeanPetLen = mean(Petal.Length),
+                                           MeanPetWid = mean(Petal.Width))
+```
+
+En Python:
+```{python}
+print iris_p.groupby(by='species').mean()
+```
+
+¿Y si queremos aplicar alguna función que no esté contemplada en el funcionamiento
+base de pandas?
+En R:
+```{r}
+iris_r %>% group_by(Species) %>% summarize(ProdSepLen = prod(Sepal.Length),
+                                           ProdSepWid = prod(Sepal.Width),
+                                           ProdPetLen = prod(Petal.Length),
+                                           ProdPetWid = prod(Petal.Width))
+```
+
+En Python:
+```{python}
+print iris_p.groupby(by="species").apply(np.prod)
+```
+
+
+# <font color="green">Combinando Data Frames</font>
+Ya vimos que existen dos tipos principales de joins: non-filtering y filtering
+joins. Sabemos que dplyr brinda funciones para realizar joins. Utilizaremos
+dos data frames distintos para los siguientes ejemplos:
+
+```{r}
+df1 <- data.frame(x1 = c("A", "B", "C"), x2 = c(1, 2, 3), stringsAsFactors = F)
+df1
+```
+```{r}
+df2 <- data.frame(x1 = c("A", "B", "D"), x3 = c("T", "F", "T"), stringsAsFactors = F)
+df2
+```
+
+```{python}
+df1_dict = {"x1": ["A", "B", "C"], "x2": [1, 2, 3]}
+df1 = pd.DataFrame.from_dict(df1_dict)
+print df1.head()
+```
+
+```{python}
+df2_dict = {"x1": ["A", "B", "D"], "x3": ["T", "F", "T"]}
+df2 = pd.DataFrame.from_dict(df2_dict)
+print df2.head()
+```
+
+
+## <font color="blue">left join</font>
+
+En R:
+```{r}
+suppressMessages(df1 %>% left_join(df2) %>% head(n = 10))
+```
+
+En Python:
+```{python}
+print pd.merge(df1, df2, how="left", on="x1")
+```
+
+## <font color="blue">right join</font>
+En R:
+```{r}
+suppressMessages(df1 %>% right_join(df2) %>% head(n=10))
+```
+
+En Python:
+```{python}
+print pd.merge(df1, df2, how="right", on="x1")
+```
+
+## <font color="blue">inner join</font>
+En R:
+```{r}
+suppressMessages(df1 %>% inner_join(df2) %>% head(n=10))
+```
+
+En Python:
+```{python}
+print pd.merge(df1, df2, how="inner", on="x1")
+```
+
+## <font color="blue">outer join</font>
+En R:
+```{r}
+suppressMessages(df1 %>% full_join(df2) %>% head())
+```
+
+En Python:
+```{python}
+print pd.merge(df1, df2, how="outer", on="x1")
+```
+
+
+Para más ejemplos de cómo combinar data frames en R pueden consultar:
+http://stat545.com/bit001_dplyr-cheatsheet.html
+
+# <font color="green">Transformar nuestros datos</font>
+En R, la biblioteca *tidyverse* está especialmente diseñada para trabajar con
+los datos en un formato que se llama "*tidy*"; un dataset se encuentra en formato
+tidy cuando cada variable se encuentra en su propia columna, y cada observación
+se encuentra en su propio renglón. En nuestro ejemplo, el dataset iris se encuentra
+en formato tidy, pues para cada una de las 150 plantas a las que se les realizaron
+mediciones, tenemos en diferentes columnas el ancho y alto de su pétalo, de su
+tallo, así como a la especie a la que pertenece.
+
+Sin embargo, habrá ocasiones en las que nos encontraremos en la necesidad de
+acomodar nuestro conjunto de datos de una forma distinta, para esto, resultan
+muy útiles dos funciones en R: **spread** y **gather**; como su nombre lo índica,
+la función spread nos ayuda a "esparcir" una columna en varias, y la función
+gather nos ayuda a juntar varias columnas en una. Por ejemplo, utilizando el
+dataset "economics" (información mensual de 5 indicadores económicos en EU:
+Tasa de Ahorro Personal, Gastos en consumo personal(billones de dólares),
+Desempleados (miles), Duración media de desempleo (semanas), Población total
+en miles).
+
+```{r}
+economics %>% head()
+```
+
+## <font color="blue">gather</font>
+En R:
+```{r}
+economics %>% gather(key = "Indicador", value = "Valor", 2:6) %>% head()
+```
+```{r}
+economics %>% gather(key = "Indicador", value = "Valor", 2:6) %>% slice(100:110)
+```
+
+
+En Python:
+
+```{python}
+economics = pd.read_csv("Economics.csv")
+print economics.head()
+```
+
+```{python}
+print economics.melt(id_vars=['date']).head()
+```
+```{python}
+print economics.melt(id_vars=["date"]).tail()
+```
+
+
+## <font color="blue">spread</font>
+En R:
+
+```{r}
+economics_gather <- economics %>% gather(key = "Indicador", value = "Valor", 2:6)
+economics_gather %>% spread(key = "Indicador", value = "Valor") %>% head()
+
+```
+
+En Python:
+```{python}
+economics_melt = economics.melt(id_vars=["date"])
+print economics_melt.head()
+```
+
+```{python}
+print economics_melt.pivot(columns='variable', values='value', index="date").head()
+```
+
+
+# <font color="green">Referencias</font>
+
